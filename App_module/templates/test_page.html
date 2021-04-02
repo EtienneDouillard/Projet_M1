@@ -1,0 +1,65 @@
+{% block head %}
+    <script src={{ url_for("static", filename="js/sample.js") }}></script>
+
+
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+{% endblock %}
+
+
+{% block body %}
+<h1>Entrez un indice de courbe pour visualiser la reconstruction: </h1>
+<form action="{{ url_for('testpage')}}"method="post">
+    <input type="text" name="data" placeholder="data" />
+    
+    <button type="submit" class="btn btn-primary btn-block btn-large">reconstruction </button>
+</form>
+
+<script type="text/javascript">
+    let list_data = {{ input_from_python | tojson }}  //Redefined here as a js variable
+
+
+    function chart(){
+        var tab=new Array();
+        for (let i = 0; i < 50; i++) {
+            tab[i]=parseFloat(list_data[i])
+        
+        }
+        
+        
+        var data = {
+        // A labels array that can contain any sort of values
+        labels: [],
+        // Our series array that contains series objects or in this case series data arrays
+        series: [
+        tab
+        
+        ]
+        };
+        // As options we currently only set a static size of 300x200 px. We can also omit this and use aspect ratio containers
+        // as you saw in the previous example
+        var options = {
+        width: 1000,
+        height: 500
+        };
+        // Create a new line chart object where as first parameter we pass in a selector
+        // that is resolving to our chart container element. The Second parameter
+        // is the actual data object. As a third parameter we pass in our custom options.
+        new Chartist.Line('.ct-chart', data, options);
+    }
+
+
+
+</script>
+
+    
+
+<p id="input_from_python">{{ input_from_python | tojson }}</p>
+
+<h1>Chart: </h1>
+
+<button type="button"  value="data_update" onclick="chart()">chart</button>
+
+<div class="ct-chart ct-perfect-fourth"></div>
+
+{% endblock %}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  {% extends 'base.html' %}
+
+  {% block head %}
+  
+  <title>Prédiction d'une courbe fonctionnelle</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="pageweb.css" />
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="styleAccueil.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      #titre {
+        padding:2em;
+        text-align: center;
+      }
+      #titre h1 {
+          color: #259422;
+      }
+      #titre p {
+          color: #000;
+          font-size: 1.3rem;
+          line-height: 1.5;
+      }
+
+      .container{
+        background-color: #243C54;
+        min-width: 100%;
+        min-height: 100%;
+      }
+      #titre2  {
+        text-align: center;
+        margin:2rem;
+        color: #50e632;
+        margin-bottom:2%;
+      }
+      .formulaireNote{
+        margin: 3%;
+        color: #fff;
+      }      
+      #element{
+        text-align: justify;
+        margin: 3%;
+      }      
+      #bouton{
+        width: 75%;
+        height: 5%;
+        position: right;
+        margin: auto;
+        border-radius: 5px;
+      }
+      #chart{
+        width: auto;
+        height: 80%;
+        font-size: 1rem;
+        background-color: white;
+      }
+      #chartSelect{
+        border-radius: 5px;
+        width: 50%;
+        margin-top: 5%;
+    
+      }
+      .container2{
+        background-color: #fff;
+        min-width: 100%;
+        text-align: center;
+      }
+      .container2 h2{
+        color: #259422;
+      }
+      #chartPredict{
+        width: 100%;
+        height: 80%;
+        font-size: 1rem;
+        background-color: white;
+      }
+      
+    </style>
+
+  <!-- Link pour les chart  --> 
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+  <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+  {% endblock %}
+
+
+
+  {% block body %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="{{ url_for('accueil')}}">Accueil</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">Notre technologie<span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link active" href="{{ url_for('about')}}">A propos</a>
+            <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
+            <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
+        </div>
+    </div>
+  </nav>
+  
+  <div id="titre">
+    <h1>Application du réseau de neurones</h3>
+    <p>Facile. Pratique.</p>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <h3 id="titre2">Choisissez un type de courbe à reconstruire :</h3>
+    </div>
+    
+    <form id="element" action="{{ url_for('prediction_courbe')}}" enctype="multipart/form-data"  method="post">
+      <div class="row inputData">
+        <div class="col-sm-3 formulaire" >
+          <div class="formulaireNote">
+            <h4>Choisir un type de fonction </h4> 
+            <select id="chartSelect"  name="chartSelect" >
+              <option value="5">Ma liste</option>
+              <option value="1">x*x</option>
+              <option value="2">exp(x)</option>
+              <option value="3">2*(x)</option>
+              <option value="4">sqrt(x)</option>
+            </select><br><br>
+            <p>Ma liste : (Fichier csv: 'liste' --> 50 points)</p>
+            <input type="file" accept=".csv" name="fichierCSV">
+            <br><br><br>
+            <h4>Veuillez saisir un indice pour le début de l'imputation :</h4> 
+            <input type="text" name="indice" value="10" />
+            <br><br><br>
+            <h4>Veuillez saisir une taille d'imputation :</h4> 
+            <input type="text" name="taille" value="12" />
+            <br><br><br>
+            <h4>Veuillez saisir une quantité de bruit :</h4> 
+            <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
+            <br><br>
+          </div>
+          
+          <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+          
+          
+
+        </div>
+        <div class="col-sm-9">
+          <div id="chart"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
+          <p style="text-align: center;color: #fff;text-decoration: underline;">Visualisation de la courbe rentrée dans l'algorithme</p> 
+        </div>
+      </div>
+    </form> 
+    
+  </div>  
+  <div class="container2" >
+    <h2 id="titre3"> Reconstruction : </h2> <br>
+    <div class="row"style="margin-left: auto;margin-right: auto;width: 80%;height: 10%;">
+      <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-major-eleventh"></div> 
+    </div>
+    <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
+  </div>
+  
+
+  <script type="text/javascript">
+    var list_data = {{ finale_prediction|default("")|tojson }} //Redefined here as a js variable
+    var list_data_input = {{ fonction_cut|default("")|tojson }}
+
+    
+    window.onload = function () { chart_input(); chart_predict(); };
+    
+    function chart_predict(){
+        var tab=new Array();
+        var new_tab=new Array();
+      
+        for (let i = 0; i < 50; i++) {
+            tab[i]=parseFloat(list_data[i])   
+            new_tab[i]=parseFloat(list_data_input[i]) 
+        }
+        
+        var data = {
+        // A labels array that can contain any sort of values
+        labels: [],
+        // Our series array that contains series objects or in this case series data arrays
+        series: [
+        new_tab,tab    
+        ]
+        };
+        // As options we currently only set a static size of 300x200 px. We can also omit this and use aspect ratio containers
+        // as you saw in the previous example
+        // Create a new line chart object where as first parameter we pass in a selector
+        // that is resolving to our chart container element. The Second parameter
+        // is the actual data object. As a third parameter we pass in our custom options.
+        new Chartist.Line('.ct-chart', data);
+    }
+
+    function chart_input(){
+        
+        var input_data=new Array();
+       
+        for (let i = 0; i < 50; i++){
+            input_data[i]=parseFloat(list_data_input[i])   
+            console.log(input_data[i])
+        }
+        
+        var data = {
+        // A labels array that can contain any sort of values
+        labels: [],
+        // Our series array that contains series objects or in this case series data arrays
+        series: [
+        input_data
+        ]
+        };
+        // As options we currently only set a static size of 300x200 px. We can also omit this and use aspect ratio containers
+        // as you saw in the previous example
+        
+        // Create a new line chart object where as first parameter we pass in a selector
+        // that is resolving to our chart container element. The Second parameter
+        // is the actual data object. As a third parameter we pass in our custom options.
+        new Chartist.Line('.ct-chart2', data);
+        
+    }
+
+  </script>
+
+ 
+
+{% endblock %}
+
+   
+
+
+</html>
