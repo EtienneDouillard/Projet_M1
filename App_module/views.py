@@ -70,6 +70,9 @@ x1 = 50*np.sqrt(np.exp(-((k_vec-1)^2)/5)) * np.random.normal(size=50)
 x2 = 50*np.sqrt(np.exp(-((k_vec)^2)/5)) * np.random.normal(size=50)
 
 
+
+
+
 #########################################################
 ###################### Données  #########################
 #########################################################
@@ -121,8 +124,9 @@ app = Flask(__name__)
 
 modelMSE = keras.models.load_model('MSE_modele\modelMSE')
 
-      
-
+#########################################################
+######################  Def  ############################
+#########################################################    
 
 def prediction(globale_reconstruction,globale_cut):
 
@@ -280,17 +284,19 @@ def prediction_courbe():
                 2 : [np.exp(x/50) for x in range(50)],
                 3 : [2*(x/50) for x in range(50)],
                 4 : [np.sqrt(x/50) for x in range(50)],
+                5 : [np.sin(2*np.pi*x/50) for x in range(50)],
                 }
     else:
         choix_courbe = {    
-                1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/100)),
-                2 : [np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/100)),
-                3 : [2*(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/100)),
-                4 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/100)),
+                1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                2 : [np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                3 : [2*(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                4 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                5 : [np.sin(2*np.pi*x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
             }
     
     
-    if(nb!=5):
+    if(nb!=6):
         y = choix_courbe.get(nb,-1)
         fonction_cut,fonction_reconstruite=cut_courbe(y,indice,taille)
     else:
@@ -334,8 +340,8 @@ def prediction_courbe():
         fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
         fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
     
-    print("finale_prediction=",finale_prediction)
-    print("fonction_cut2=",fonction_cut2)
+    #print("finale_prediction=",finale_prediction)
+    #print("fonction_cut2=",fonction_cut2)
 
     return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2,fonction_reconstruite=fonction_reconstruite2,globale_cut=globale_cut,globale_reconstruction=globale_reconstruction)
 

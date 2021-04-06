@@ -37,6 +37,7 @@
         margin:2rem;
         color: #50e632;
         margin-bottom:2%;
+      
       }
       .formulaireNote{
         margin: 3%;
@@ -53,7 +54,7 @@
         margin: auto;
         border-radius: 5px;
       }
-      #chart{
+      #chartInput{
         width: auto;
         height: 80%;
         font-size: 1rem;
@@ -68,14 +69,16 @@
       .container2{
         background-color: #fff;
         min-width: 100%;
+     
         text-align: center;
       }
       .container2 h2{
         color: #259422;
       }
       #chartPredict{
-        width: 100%;
-        height: 80%;
+        text-align: center;
+       
+     
         font-size: 1rem;
         background-color: white;
       }
@@ -126,6 +129,7 @@
               <option value="2">exp(x)</option>
               <option value="3">2*(x)</option>
               <option value="4">sqrt(x)</option>
+              <option value="5">sin(x)</option>
             </select><br><br>
             <p>Ma liste : (Fichier csv: 'liste' --> 50 points)</p>
             <input type="file" accept=".csv" name="fichierCSV">
@@ -147,17 +151,17 @@
 
         </div>
         <div class="col-sm-9">
-          <div id="chart"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
+          <div id="chartInput"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
           <p style="text-align: center;color: #fff;text-decoration: underline;">Visualisation de la courbe rentrée dans l'algorithme</p> 
         </div>
       </div>
     </form> 
     
   </div>  
-  <div class="container2" >
+  <div class="container2">
     <h2 id="titre3"> Reconstruction : </h2> <br>
-    <div class="row"style="margin-left: auto;margin-right: auto;width: 80%;height: 10%;">
-      <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-major-eleventh"></div> 
+    <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
+      <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
     </div>
     <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
   </div>
