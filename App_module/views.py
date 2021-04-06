@@ -126,10 +126,12 @@ modelMSE = keras.models.load_model('MSE_modele\modelMSE')
 
 def prediction(globale_reconstruction,globale_cut):
 
-    print("globale_reconstruction=",globale_reconstruction)
-    pred=modelMSE.predict(globale_reconstruction)
+    #print("globale_reconstruction=",globale_reconstruction)
+    pred=modelMSE.predict(tf.keras.utils.normalize(globale_reconstruction))
 
     pred=pred.reshape(50)
+    #print("pred=",pred)
+    
     #Nouvelle courbe prédite 
     predictionCourbe = np.full(50,np.nan)
     finale_prediction=[0]*len(pred)
@@ -144,8 +146,14 @@ def prediction(globale_reconstruction,globale_cut):
                 predictionCourbe[j] = globale_cut[j]
         if (np.isnan(globale_cut[j])):
             predictionCourbe[j] = pred[j]
+
+
+
         
         finale_prediction[j]=json.dumps(float(predictionCourbe[j]))
+
+   
+
         
 
     return finale_prediction
@@ -315,7 +323,7 @@ def prediction_courbe():
 
     finale_prediction=prediction(globale_reconstruction,globale_cut)
 
-
+    
 
     fonction_cut2=[0]*(len(fonction_cut))
     fonction_reconstruite2=[0]*(len(fonction_cut))
@@ -326,6 +334,8 @@ def prediction_courbe():
         fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
         fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
     
+    print("finale_prediction=",finale_prediction)
+    print("fonction_cut2=",fonction_cut2)
 
     return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2,fonction_reconstruite=fonction_reconstruite2,globale_cut=globale_cut,globale_reconstruction=globale_reconstruction)
 
