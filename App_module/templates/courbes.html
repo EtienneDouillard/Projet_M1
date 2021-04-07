@@ -18,6 +18,9 @@
         padding:2em;
         text-align: center;
       }
+      h4{
+        color:white;
+      }
       #titre h1 {
           color: #259422;
       }
@@ -43,10 +46,7 @@
         margin: 3%;
         color: #fff;
       }      
-      #element{
-        text-align: justify;
-        margin: 3%;
-      }      
+       
       #bouton{
         width: 75%;
         height: 5%;
@@ -66,6 +66,12 @@
         margin-top: 5%;
     
       }
+      #imputationSelect{
+        border-radius: 5px;
+        width: 50%;
+        margin-top: 5%;
+
+      }
       .container2{
         background-color: #fff;
         min-width: 100%;
@@ -82,6 +88,34 @@
         font-size: 1rem;
         background-color: white;
       }
+    
+    #form {
+      text-align: justify;
+      margin: 3%;
+    }
+
+    #select{
+      width: 20%;
+      height: 20%;
+      background-color: white;
+
+      margin: auto;
+      border-radius: 5px;
+    }
+
+
+    .form-part {
+      text-align: left;
+      margin: 2px;
+      color: white;
+      display: none;
+    }
+
+    #form[data-choice="1"] .p1, 
+    #form[data-choice="2"] .p2, 
+    #form[data-choice="3"] .p3{
+        display: block;
+    }
       
     </style>
 
@@ -115,46 +149,109 @@
 
   <div class="container">
     <div class="row">
-      <h3 id="titre2">Choisissez un type de courbe à reconstruire :</h3>
+      <h3 id="titre2">Choisir un format de saisie de données :</h3>
     </div>
     
-    <form id="element" action="{{ url_for('prediction_courbe')}}" enctype="multipart/form-data"  method="post">
+    <form id="form" action="{{ url_for('prediction_courbe')}}" enctype="multipart/form-data"  method="post">
+      <br>
+      <select id="select" onchange="this.parentNode.dataset.choice = this.value;">
+        <option value="0">Make a choice</option>
+        <option value="1">Données présélectionnées</option>
+        <option value="2">Fichier CSV</option>
+        <option value="3">Données saisies manuellement</option>
+      </select>
+      <br>
+      <br>
       <div class="row inputData">
-        <div class="col-sm-3 formulaire" >
-          <div class="formulaireNote">
-            <h4>Choisir un type de fonction </h4> 
-            <select id="chartSelect"  name="chartSelect" >
-              <option value="5">Ma liste</option>
-              <option value="1">x*x</option>
-              <option value="2">exp(x)</option>
-              <option value="3">2*(x)</option>
-              <option value="4">sqrt(x)</option>
-              <option value="5">sin(x)</option>
-            </select><br><br>
-            <p>Ma liste : (Fichier csv: 'liste' --> 50 points)</p>
-            <input type="file" accept=".csv" name="fichierCSV">
-            <br><br><br>
-            <h4>Veuillez saisir un indice pour le début de l'imputation :</h4> 
-            <input type="text" name="indice" value="10" />
-            <br><br><br>
-            <h4>Veuillez saisir une taille d'imputation :</h4> 
-            <input type="text" name="taille" value="12" />
-            <br><br><br>
-            <h4>Veuillez saisir une quantité de bruit :</h4> 
-            <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
-            <br><br>
-          </div>
-          
-          <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
-          
-          
+        
+        <div class="col-sm-3 formulaire" > 
 
-        </div>
+
+            <div class="form-part p1">
+              <h4>Données d'entrée présélectionnées </h4>
+                <div id="choix_type_function">
+                  <br>
+                  <br>
+                  <h5>Choisir un type de fonction</h5> 
+                    <select id="chartSelect"  name="chartSelect" >
+                      <option value="5">Ma liste</option>
+                      <option value="1">x*x</option>
+                      <option value="2">exp(x)</option>
+                      <option value="3">2*(x)</option>
+                      <option value="4">-sqrt(x)</option>
+                      <option value="5">sin(x)</option>
+                    </select>
+                </div>
+                <br>
+                <br>
+                <div id="choix_type_cut">
+                  <h5>Choisir un type d'imputation</h5> 
+                    <select id="imputationSelect"  name="chartSelect" >
+                      <option value="1">0-10</option>
+                      <option value="2">10-20</option>
+                      <option value="3">20-30</option>
+                      <option value="4">30-40</option>
+                      <option value="5">40-50</option>
+      
+                    </select>
+                </div>
+                <br>
+                <br>
+                <h5>Saisir une quantité de bruit :</h5> 
+                <br>
+                <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
+              <br>
+              <br>
+            </div>
+            
+
+            <div class="form-part p2">
+              <h4>Données d'entrée sélectionnées depuis un fichier csv </h4>
+              <br>
+              <br>
+              <p>Ma liste : (Fichier csv: 'liste' --> 50 points)</p>
+              <input type="file" accept=".csv" name="fichierCSV">
+            </div>
+            <br>
+            <br>
+            <div class="form-part p3">
+              <h4>Données d'entrée sélectionnées à la main </h4>
+              <div id="choix_type_function">
+                <br>
+                <br>
+                <h4>Choisir un type de fonction </h4> 
+                <select id="chartSelect"  name="chartSelect" >
+                  <option value="5">Ma liste</option>
+                  <option value="1">x*x</option>
+                  <option value="2">exp(x)</option>
+                  <option value="3">2*(x)</option>
+                  <option value="4">-sqrt(x)</option>
+                  <option value="5">sin(x)</option>
+                </select>
+              </div>
+             <br>
+             <br>            
+              <h4>Saisir un indice pour le début de l'imputation :</h4> 
+              <input type="text" name="indice" value="10" />
+              <br><br><br>
+              <h4>Saisir une taille d'imputation :</h4> 
+              <input type="text" name="taille" value="12" />
+              <br><br><br>
+              <h4>Saisir une quantité de bruit :</h4> 
+              <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
+            </div>
+            <br>
+            <br>
+            
+            <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+          </div>
         <div class="col-sm-9">
           <div id="chartInput"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
           <p style="text-align: center;color: #fff;text-decoration: underline;">Visualisation de la courbe rentrée dans l'algorithme</p> 
         </div>
+        
       </div>
+     
     </form> 
     
   </div>  
@@ -173,7 +270,10 @@
 
     
     window.onload = function () { chart_input(); chart_predict(); };
-    
+
+
+
+      
     function chart_predict(){
         var tab=new Array();
         var new_tab=new Array();
