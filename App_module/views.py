@@ -70,9 +70,6 @@ x1 = 50*np.sqrt(np.exp(-((k_vec-1)^2)/5)) * np.random.normal(size=50)
 x2 = 50*np.sqrt(np.exp(-((k_vec)^2)/5)) * np.random.normal(size=50)
 
 
-
-
-
 #########################################################
 ###################### Données  #########################
 #########################################################
@@ -124,6 +121,7 @@ app = Flask(__name__)
 
 modelMSE = keras.models.load_model('MSE_modele\modelMSE')
 
+fonction_reconstruite=[]
 #########################################################
 ######################  Def  ############################
 #########################################################    
@@ -141,6 +139,7 @@ def prediction(globale_reconstruction,globale_cut):
     finale_prediction=[0]*len(pred)
 
     #remplacer les valeurs pour faire une seule et unique courbe à plot 
+   
     for j in range(50):
         if(j+1<49):
             if (np.isnan(globale_cut[j+1]) ):
@@ -150,15 +149,27 @@ def prediction(globale_reconstruction,globale_cut):
                 predictionCourbe[j] = globale_cut[j]
         if (np.isnan(globale_cut[j])):
             predictionCourbe[j] = pred[j]
-
-
-
-        
         finale_prediction[j]=json.dumps(float(predictionCourbe[j]))
 
-   
+  
+  
+    """
+    if not np.isnan(globale_cut[0]):
+        diff = pred[0] - globale_cut[0]
+    else:
+        diff = pred[-1] - globale_cut[-1]
 
-        
+
+    for j in range(50):
+        if(j+1<49):
+            if (np.isnan(globale_cut[j+1]) ):
+                predictionCourbe[j] = globale_cut[j]
+        if(j-1>0):
+            if (np.isnan(globale_cut[j-1])):
+                predictionCourbe[j] = globale_cut[j]
+        if (np.isnan(globale_cut[j])):
+            predictionCourbe[j] = pred[j] - diff
+    """   
 
     return finale_prediction
 
@@ -266,40 +277,45 @@ def navbar():
 @app.route('/prediction_courbe',methods=['POST'])
 def prediction_courbe():
 
-    select = request.form.getlist('chartSelect')
-    indice = request.form.get("indice")
-    taille = request.form.get("taille")
-    bruit = request.form.get("customRange")
-    if indice.isdigit() and taille.isdigit() and bruit.isdigit() and select[0].isdigit():
-        indice=int(indice)
-        taille=int(taille)
-        bruit = int(bruit)
-        nb=int(select[0])
+    #requètes POST du type de saisie de données lors du sibmit du formulaire. 
+    select = request.form.getlist("select")
+
+    #Choix préselection
+    #imputationSelect=request.form.getlist('imputationSelect')
+   
+
+    if  select[0].isdigit():
+        indice_type_saisie = int(select[0])
+        #imputationSelection=int(imputationSelect[0])
+
     else:
         return render_template('courbes.html') 
     
-    if (bruit==0):
-        choix_courbe = {    
-                1 : [(x/50)**2 for x in range(50)],
-                2 : [np.exp(x/50) for x in range(50)],
-                3 : [2*(x/50) for x in range(50)],
-                4 : [np.sqrt(x/50) for x in range(50)],
-                5 : [np.sin(2*np.pi*x/50) for x in range(50)],
-                }
-    else:
-        choix_courbe = {    
-                1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                2 : [np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                3 : [2*(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                4 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                5 : [np.sin(2*np.pi*x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-            }
-    
-    
-    if(nb!=6):
-        y = choix_courbe.get(nb,-1)
-        fonction_cut,fonction_reconstruite=cut_courbe(y,indice,taille)
-    else:
+    #possible_saisie = {    
+    #            1 : "Données d'entrée présélectionnées",
+    #            2 : "Données d'entrée sélectionnées depuis un fichier csv ",
+    #            3 : "Données d'entrée sélectionnées à la main ",
+    #            }
+
+    #choix_saisie_data = possible_saisie.get(indice_type_saisie,-1)
+
+
+    ######################################
+    # Choix 1                            #
+    # Données d'entrée présélectionnées  #
+    ######################################
+
+    if(indice_type_saisie==1):
+        print("Données préselection",indice_type_saisie)
+        return render_template('courbes.html')
+
+        
+    ################
+    # Choix 2      #
+    # Fichier CSV  #
+    ################
+    elif (indice_type_saisie==2):
+        print("données csv ",indice_type_saisie)
         fichier = request.files['fichierCSV']
         stream = io.StringIO(fichier.stream.read().decode("UTF8"), newline=None)
         csv_input = csv.reader(stream)
@@ -321,29 +337,86 @@ def prediction_courbe():
             print("La taille doit être de 50 et ne comporter qu'une liste")
             return render_template('courbes.html') 
         fonction_cut,fonction_reconstruite = reconstruction(fonction_cut)
+    
+        #Reconstruction et prédiction données présélectionnées  
+        globale_reconstruction=(np.array(fonction_reconstruite)).reshape(1,1,50)
+        globale_cut=(np.array(fonction_cut)).reshape(50)
+
+        finale_prediction=prediction(globale_reconstruction,globale_cut)
+
+        #données fonctionnelles reconstruites suite auc données préselectionnées 
+        fonction_cut2=[0]*(len(fonction_cut))
+        fonction_reconstruite2=[0]*(len(fonction_cut))
+
+        #passage en json.dump pour traitement js dans chart. 
+        for j in range(50):
+            fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
+            fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
+    
+        return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2)
+
+
+      
+    ################
+    # Choix 3
+    # Données d'entrée sélectionnées à la main
+    else:
+        print("Données d'entrée sélectionnées à la main",indice_type_saisie)
+
+        #Request des données en POST 
+        select_chart3 = request.form.getlist('chartSelect3')
+
+        indice_type_courbe3 = int( select_chart3[0])
+
+        bruit = request.form.get("customRange3")
+        bruit = int(bruit)
+       
+        if (bruit==0):
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)],
+                    2 : [np.exp(x/50) for x in range(50)],
+                    3 : [2*(x/50) for x in range(50)],
+                    4 : [-np.sqrt(x/50) for x in range(50)],
+                    5 : [np.sin(2*np.pi*x/50) for x in range(50)],
+                    }
+        else:
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    2 : [np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    3 : [2*(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    4 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    5 : [np.sin(2*np.pi*x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                }
         
-    
+        print("indice_type_courbe3",indice_type_courbe3)
+        if(indice_type_courbe3!=6):
+           
+            indice3 = request.form.get("indice3")
+            taille3 = request.form.get("taille3")
+            indice3 = int(indice3)
+            taille3 = int(taille3)
+            y = choix_courbe.get(indice_type_courbe3,-1)
+            fonction_cut3,fonction_reconstruite3=cut_courbe(y,indice3,taille3)
+        
+        ##Reconstruction et prédiction données manuelles  
+        globale_reconstruction3=(np.array(fonction_reconstruite3)).reshape(1,1,50)
+        globale_cut3=(np.array(fonction_cut3)).reshape(50)
 
-    globale_reconstruction=(np.array(fonction_reconstruite)).reshape(1,1,50)
-    globale_cut=(np.array(fonction_cut)).reshape(50)
+        finale_prediction3=prediction(globale_reconstruction3,globale_cut3)
 
-    finale_prediction=prediction(globale_reconstruction,globale_cut)
+        #données fonctionnelles reconstruites suite auc données manuelles 
+        fonction_cut3_2=[0]*(len(fonction_cut3))
+        fonction_reconstruite3_2=[0]*(len(fonction_cut3))
 
-    
+        #passage en json.dump pour traitement js dans chart. 
+        for j in range(50):
+            fonction_cut3_2[j]=(json.dumps(float(fonction_cut3[j])))
+            fonction_reconstruite3_2[j]=(json.dumps(float(fonction_reconstruite3[j])))
 
-    fonction_cut2=[0]*(len(fonction_cut))
-    fonction_reconstruite2=[0]*(len(fonction_cut))
 
-    #
-    for j in range(50):
-        #fonction_cut[j]=json.dumps(list(fonction_cut[j].astype(float)))
-        fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
-        fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
-    
-    #print("finale_prediction=",finale_prediction)
-    #print("fonction_cut2=",fonction_cut2)
+        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,fonction_reconstruite=fonction_reconstruite3_2,globale_cut=globale_cut3,globale_reconstruction=globale_reconstruction3)
 
-    return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2,fonction_reconstruite=fonction_reconstruite2,globale_cut=globale_cut,globale_reconstruction=globale_reconstruction)
+        
 
 #essayer de faire un def avec cxe smodèles prédifinis ici pour les utiliser ensuite dans predict 
 
@@ -394,17 +467,4 @@ def predict():
         return render_template('courbes.html', output_prediction_python=prediction)
     print("liste vide 0")
     return render_template('courbes.html')
-"""
-"""
-# create the route to provide the csv file
-@app.route('/provideCSV')
-def provide_csv():
-    # get the path of the file saved in the data folder
-    doutput = pd.read_csv("App_module//DATA//data.csv")
-    data_file =  pd.DataFrame(data=doutput)
-
-    prediction=data_file['output']
-    
-    return render_template('index.html', result_csv = prediction)
-   
 """

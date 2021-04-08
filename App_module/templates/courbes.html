@@ -48,8 +48,8 @@
       }      
        
       #bouton{
-        width: 75%;
-        height: 5%;
+        width: 90%;
+        height: 50%;
         position: right;
         margin: auto;
         border-radius: 5px;
@@ -154,7 +154,8 @@
     
     <form id="form" action="{{ url_for('prediction_courbe')}}" enctype="multipart/form-data"  method="post">
       <br>
-      <select id="select" onchange="this.parentNode.dataset.choice = this.value;">
+      <br>
+      <select name="select" id="select" onchange="this.parentNode.dataset.choice = this.value;">
         <option value="0">Make a choice</option>
         <option value="1">Données présélectionnées</option>
         <option value="2">Fichier CSV</option>
@@ -166,18 +167,17 @@
         
         <div class="col-sm-3 formulaire" > 
 
-
             <div class="form-part p1">
               <h4>Données d'entrée présélectionnées </h4>
                 <div id="choix_type_function">
-                  <br>
-                  <br>
+                <br>
+                <br>
                   <h5>Choisir un type de fonction</h5> 
                     <select id="chartSelect"  name="chartSelect" >
                       <option value="5">Ma liste</option>
                       <option value="1">x*x</option>
                       <option value="2">exp(x)</option>
-                      <option value="3">2*(x)</option>
+                      <option value="3">2x</option>
                       <option value="4">-sqrt(x)</option>
                       <option value="5">sin(x)</option>
                     </select>
@@ -186,13 +186,12 @@
                 <br>
                 <div id="choix_type_cut">
                   <h5>Choisir un type d'imputation</h5> 
-                    <select id="imputationSelect"  name="chartSelect" >
+                    <select id="imputationSelect"  name="imputationSelect" >
                       <option value="1">0-10</option>
                       <option value="2">10-20</option>
                       <option value="3">20-30</option>
                       <option value="4">30-40</option>
                       <option value="5">40-50</option>
-      
                     </select>
                 </div>
                 <br>
@@ -200,27 +199,34 @@
                 <h5>Saisir une quantité de bruit :</h5> 
                 <br>
                 <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
-              <br>
-              <br>
+                <br>
+                <br>
+                <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+
             </div>
             
 
             <div class="form-part p2">
-              <h4>Données d'entrée sélectionnées depuis un fichier csv </h4>
+              <h4>Données d'entrée depuis un fichier csv </h4>
+              
               <br>
+              <h5>Ma liste : (Fichier csv: 'liste' --> 50 points)</h5>
+              
               <br>
-              <p>Ma liste : (Fichier csv: 'liste' --> 50 points)</p>
               <input type="file" accept=".csv" name="fichierCSV">
+              <br>
+              <br>
+              <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+
             </div>
-            <br>
-            <br>
+             
+
             <div class="form-part p3">
               <h4>Données d'entrée sélectionnées à la main </h4>
               <div id="choix_type_function">
-                <br>
-                <br>
-                <h4>Choisir un type de fonction </h4> 
-                <select id="chartSelect"  name="chartSelect" >
+              <br>
+                <h5>Choisir un type de fonction </h5> 
+                <select id="chartSelect"  name="chartSelect3" >
                   <option value="5">Ma liste</option>
                   <option value="1">x*x</option>
                   <option value="2">exp(x)</option>
@@ -229,21 +235,26 @@
                   <option value="5">sin(x)</option>
                 </select>
               </div>
-             <br>
-             <br>            
-              <h4>Saisir un indice pour le début de l'imputation :</h4> 
-              <input type="text" name="indice" value="10" />
-              <br><br><br>
-              <h4>Saisir une taille d'imputation :</h4> 
-              <input type="text" name="taille" value="12" />
-              <br><br><br>
-              <h4>Saisir une quantité de bruit :</h4> 
-              <input type="range" style="width:80%" class="form-range" name="customRange" value="0"/>
+              <br>
+              <br>          
+              <h5>Saisir un indice pour le début de l'imputation :</h5> 
+              <input type="text" name="indice3" value="10" />
+              <br>
+              <br>
+              <h5>Saisir une taille d'imputation :</h5> 
+              <input type="text" name="taille3" value="12" />
+              <br>
+              <br>
+              <h5>Saisir une quantité de bruit :</h5> 
+              <input type="range" style="width:80%" class="form-range" name="customRange3" value="0"/>
+              <br>
+              <br>
+
+              <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+
             </div>
-            <br>
-            <br>
-            
-            <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
+           
+
           </div>
         <div class="col-sm-9">
           <div id="chartInput"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
