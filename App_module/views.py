@@ -306,8 +306,74 @@ def prediction_courbe():
     ######################################
 
     if(indice_type_saisie==1):
-        print("Données préselection",indice_type_saisie)
-        return render_template('courbes.html')
+        #print("Données préselection",indice_type_saisie)
+        #Request des données en POST 
+        select_chart1 = request.form.getlist('chartSelect1')
+        bruit = request.form.get("customRange1")
+        indice_type_courbe1 = int(select_chart1[0])
+
+        #print(indice_type_courbe1)
+
+       
+        bruit = int(bruit)
+       
+        if (bruit==0):
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)],
+                    2 : [np.exp(x/50) for x in range(50)],
+                    3 : [2*(x/50) for x in range(50)],
+                    4 : [-np.sqrt(x/50) for x in range(50)],
+                    5 : [np.sin(2*np.pi*x/50) for x in range(50)],
+                    }
+        else:
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    2 : [np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    3 : [2*(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    4 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                    5 : [np.sin(2*np.pi*x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
+                }
+        
+        
+        if(indice_type_courbe1!=6):
+           
+            imputationSelect=request.form.getlist('imputationSelect')
+
+            indice_imputationSelect=int(imputationSelect[0])
+
+            #print("indice_imputationSelect",indice_imputationSelect)
+
+            choix_imputation = {    
+                    1 : 0,
+                    2 : 10,
+                    3 : 20,
+                    4 : 30,
+                    5 : 40,
+                }
+              
+            y = choix_courbe.get(indice_type_courbe1,-1)
+
+            indice1 = choix_imputation.get(indice_imputationSelect,-1)
+
+    
+            fonction_cut1,fonction_reconstruite1=cut_courbe(y,indice1,10)
+        
+        ##Reconstruction et prédiction données manuelles  
+        globale_reconstruction1=(np.array(fonction_reconstruite1)).reshape(1,1,50)
+        globale_cut1=(np.array(fonction_cut1)).reshape(50)
+
+        finale_prediction1=prediction(globale_reconstruction1,globale_cut1)
+
+        #données fonctionnelles reconstruites suite aux données présélectionnées 
+        fonction_cut1_2=[0]*(len(fonction_cut1))
+        fonction_reconstruite1_2=[0]*(len(fonction_cut1))
+
+        #passage en json.dump pour traitement js dans chart. 
+        for j in range(50):
+            fonction_cut1_2[j]=(json.dumps(float(fonction_cut1[j])))
+            fonction_reconstruite1_2[j]=(json.dumps(float(fonction_reconstruite1[j])))
+
+        return render_template('courbes.html',finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,fonction_reconstruite=fonction_reconstruite1_2,globale_cut=globale_cut1,globale_reconstruction=globale_reconstruction1)
 
         
     ################
@@ -357,9 +423,11 @@ def prediction_courbe():
 
 
       
-    ################
-    # Choix 3
-    # Données d'entrée sélectionnées à la main
+    ############################################
+    # Choix 3                                  #
+    # Données d'entrée sélectionnées à la main #
+    ############################################
+    
     else:
         print("Données d'entrée sélectionnées à la main",indice_type_saisie)
 
