@@ -318,6 +318,7 @@ def prediction_courbe():
                     4 : [-np.sqrt(x/50) for x in range(50)],
                     5 : [np.sin(2*np.pi*x/50) for x in range(50)],
                     }
+
         else:
             choix_courbe = {    
                     1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
@@ -504,7 +505,8 @@ def prediction_courbe():
             indice3 = request.form.get("indice3")
             taille3 = request.form.get("taille3")
             
-            if  indice3.isdigit() and taille3 :
+            #condition erreur si les entrés ne sont pas des chiffres 
+            if  indice3.isdigit() and taille3.isdigit() :
                 indice3 = int(indice3)
                 taille3 = int(taille3)
 
