@@ -13,12 +13,130 @@
       rel="stylesheet">
 
   
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/accueil.css') }}">
+   <!-- <link rel="stylesheet" href="{{ url_for('static',filename='css/accueil.css') }}"> -->
 
+    <style>
+
+      #header {
+          background-size:cover;
+          background-position:center;
+          position:relative;
+          height: 70%;
+      }
+
+      .overlay {
+          position: absolute;
+          height: 30%;
+          min-width: 100%;
+          left: 0;
+          top: 15%;
+          background: rgba(255, 255, 255, 0.6);
+      }
+
+      .description {
+          left: 50%;
+          position: absolute;
+          top: 45%;
+          transform: translate(-50%, -55%);
+          text-align: center;
+      }
+      .description h1 {
+          color: #259422;
+      }
+      .description p {
+          color: #000;
+          font-size: 1.3rem;
+          line-height: 1.5;
+      }
+
+      #presentation {
+        min-width: 100%;
+        background-color: #243C54;
+      }
+      .margeTableau {
+        padding: 2em;
+      }
+      .imgPresentation{
+        background-size:cover;
+        background-position:center;
+        position:relative;
+        width: auto;
+          height: auto;
+        border: solid;
+      }
+      .imgPresentation img{
+        width: 100%;
+        height: 100%;
+      }
+
+
+      .textPresentation  {
+        background-color: #fff;
+        border: solid;
+      }
+      h3{
+        margin-top: 10%;
+        color: #259422;
+        text-align: center;
+      }
+      .ssTitre{
+        text-align: center;
+      }
+      p{
+        text-align: center;
+        text-align: justify;
+        margin-left: 10%;
+        margin-right: 10%;
+      }
+
+      .no-padding > [class*='col-'] {
+        padding-right:0;
+        padding-left:0;
+      }
+
+      .notreTechnologie{
+          background-size:cover;
+          background-position:center;
+          position:relative;
+      }
+
+      .overlay_technologie {
+        position: absolute;
+        min-height: 100%;
+        min-width: 50%;
+        left: 25%;
+        top: 0;
+        background: rgba(255, 255, 255, 0.5);
+      }
+      .description_technologie {
+        left: 50%;
+        position: absolute;
+        top: 45%;
+        transform: translate(-50%, -55%);
+        text-align: center;
+      }
+
+
+
+
+      #citation {
+        text-align: center;
+        padding: 2em;
+        background-color: #243C54;
+        color:#fff
+      }
+      #auteur {
+        font-size:x-small;
+      }
+      a:hover{
+        color:#0d4202;
+      }
+
+    </style>
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="min-height: 10%;">
       <a class="navbar-brand" href="{{ url_for('accueil')}}">Accueil</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -36,11 +154,11 @@
     </nav>
 
     <div>
-      <img id="header" src="{{url_for('static',filename='img/splashColor.jpg')}}" class="page-header header container-fluid" >
+      <img id="header" src="{{url_for('static',filename='img/Accueil_2.jpg')}}" class="page-header header container-fluid" style="min-width: 100%;" >
       <div class="overlay">
         <div class="description">
           <h1>Reconstruction de données</h1>
-          <h4> Intelligence Artificielle</h4>
+          <h4>Intelligence Artificielle</h4>
         </div>
       </div>
     </div>
@@ -49,7 +167,7 @@
     <div id="presentation" class="container">
       <div class="row no-padding margeTableau">
         <div class="col-sm-7 imgPresentation">
-          <img src="{{ url_for('static',filename='img/splashColor.jpg') }}">
+          <img src="{{ url_for('static',filename='img/about_us_2.jpg') }}">
         </div>
         <div class="col-sm-5 textPresentation">
           <a href="{{ url_for('about')}}"><h3>Qui somme-nous</h3></a>
@@ -62,7 +180,7 @@
     </div>
 
     <div class="container-fluid notreTechnologie" >
-      <img src="{{url_for('static',filename='img/splashColor.jpg')}}" class="container-fluid notreTechnologie">
+      <img src="{{url_for('static',filename='img/courbe_1.jpg')}}" class="container-fluid notreTechnologie">
       <div class="overlay_technologie">
         <div class="description_technologie">
           <a href="{{url_for('courbes')}}"><h3>Tester notre technologie de reconstruction</h3></a><br>
