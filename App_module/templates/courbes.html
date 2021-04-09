@@ -29,6 +29,11 @@
           font-size: 1.3rem;
           line-height: 1.5;
       }
+      #legende{
+        color:white;
+        text-align: center;
+        font-size: 1.3rem;
+      }
 
       .container{
         background-color: #243C54;
@@ -164,6 +169,7 @@
       <br>
       <br>
       <div class="row inputData">
+       
         
         <div class="col-sm-3 formulaire" > 
 
@@ -188,10 +194,11 @@
                   <h5>Choisir un type d'imputation</h5> 
                     <select id="imputationSelect"  name="imputationSelect" >
                       <option value="1">0-10</option>
-                      <option value="2">10-20</option>
-                      <option value="3">20-30</option>
-                      <option value="4">30-40</option>
-                      <option value="5">40-50</option>
+                      <option value="2">10-18</option>
+                      <option value="3">18-27</option>
+                      <option value="4">27-36</option>
+                      <option value="5">36-45</option>
+                      <option value="6">45-50</option>
                     </select>
                 </div>
                 <br>
@@ -256,7 +263,13 @@
            
 
           </div>
+          
         <div class="col-sm-9">
+          <div id="legende">
+            <h5> Type de courbe à reconstruire : {{type_courbe}}.  Indices d'imputation : {{indice_imputation}}. Bruit :{{qte_bruit}}%</h5>
+          </div>
+          
+          <br>
           <div id="chartInput"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div>      
           <p style="text-align: center;color: #fff;text-decoration: underline;">Visualisation de la courbe rentrée dans l'algorithme</p> 
         </div>
@@ -266,12 +279,14 @@
     </form> 
     
   </div>  
-  <div class="container2">
-    <h2 id="titre3"> Reconstruction : </h2> <br>
-    <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
-      <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
-    </div>
-    <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
+    <div class="container2">
+      <h2 id="titre3"> Reconstruction : </h2> <br>
+      <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.   </h5>
+      <h5>Modèle utilisé : {{modele}}</h5>
+      <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
+        <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
+      </div>
+      <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
   </div>
   
 

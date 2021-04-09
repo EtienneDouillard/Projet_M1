@@ -280,13 +280,8 @@ def prediction_courbe():
     #requètes POST du type de saisie de données lors du sibmit du formulaire. 
     select = request.form.getlist("select")
 
-    #Choix préselection
-    #imputationSelect=request.form.getlist('imputationSelect')
-   
-
     if  select[0].isdigit():
         indice_type_saisie = int(select[0])
-        #imputationSelection=int(imputationSelect[0])
 
     else:
         return render_template('courbes.html') 
@@ -296,8 +291,6 @@ def prediction_courbe():
     #            2 : "Données d'entrée sélectionnées depuis un fichier csv ",
     #            3 : "Données d'entrée sélectionnées à la main ",
     #            }
-
-    #choix_saisie_data = possible_saisie.get(indice_type_saisie,-1)
 
 
     ######################################
@@ -325,6 +318,7 @@ def prediction_courbe():
                     4 : [-np.sqrt(x/50) for x in range(50)],
                     5 : [np.sin(2*np.pi*x/50) for x in range(50)],
                     }
+
         else:
             choix_courbe = {    
                     1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
@@ -346,34 +340,61 @@ def prediction_courbe():
             choix_imputation = {    
                     1 : 0,
                     2 : 10,
-                    3 : 20,
-                    4 : 30,
-                    5 : 40,
+                    3 : 18,
+                    4 : 27,
+                    5 : 36,
+                    6 : 45,
                 }
-              
-            y = choix_courbe.get(indice_type_courbe1,-1)
+             #str pour légende type de courbe penser à modifer lors d'ajout de nouveaux modèles. 
+            choix_type_courbe={
+                    1 : "x**2",
+                    2 : "exp(x)",
+                    3 : "2x",
+                    4 : "-sqrt(x)",
+                    5 : "sin(x)",
+                }
 
-            indice1 = choix_imputation.get(indice_imputationSelect,-1)
-
-    
-            fonction_cut1,fonction_reconstruite1=cut_courbe(y,indice1,10)
         
-        ##Reconstruction et prédiction données manuelles  
+        
+            
+            #Légende type de courbe 
+            type_courbe=choix_type_courbe.get(indice_type_courbe1,-1)
+
+            #légende indice d'imputation 
+            if (indice_imputationSelect != 6):
+                indiceStart = choix_imputation.get(indice_imputationSelect,-1)
+                indiceEnd = choix_imputation.get((indice_imputationSelect+1),-1)
+                indice_imputation = [indiceStart,indiceEnd]
+                
+            else:
+                indiceStart = choix_imputation.get(indice_imputationSelect,-1)
+                indiceEnd=50
+                indice_imputation = [indiceStart,indiceEnd]
+               
+            #Fonction cut d'entrée 
+            y = choix_courbe.get(indice_type_courbe1,-1)
+            fonction_cut1,fonction_reconstruite1=cut_courbe(y,indiceStart,indiceEnd-indiceStart)
+       
+
+
+
+
+        #Reconstruction et prédiction données manuelles  
         globale_reconstruction1=(np.array(fonction_reconstruite1)).reshape(1,1,50)
         globale_cut1=(np.array(fonction_cut1)).reshape(50)
 
         finale_prediction1=prediction(globale_reconstruction1,globale_cut1)
 
-        #données fonctionnelles reconstruites suite aux données présélectionnées 
+        #Données fonctionnelles reconstruites suite aux données présélectionnées 
         fonction_cut1_2=[0]*(len(fonction_cut1))
         fonction_reconstruite1_2=[0]*(len(fonction_cut1))
 
-        #passage en json.dump pour traitement js dans chart. 
+        #Passage en json.dump pour traitement js dans chart. 
         for j in range(50):
             fonction_cut1_2[j]=(json.dumps(float(fonction_cut1[j])))
             fonction_reconstruite1_2[j]=(json.dumps(float(fonction_reconstruite1[j])))
 
-        return render_template('courbes.html',finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,fonction_reconstruite=fonction_reconstruite1_2,globale_cut=globale_cut1,globale_reconstruction=globale_reconstruction1)
+        return render_template('courbes.html',finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit)
 
         
     ################
@@ -381,16 +402,21 @@ def prediction_courbe():
     # Fichier CSV  #
     ################
     elif (indice_type_saisie==2):
-        print("données csv ",indice_type_saisie)
+        #print("données csv ",indice_type_saisie)
         fichier = request.files['fichierCSV']
         stream = io.StringIO(fichier.stream.read().decode("UTF8"), newline=None)
         csv_input = csv.reader(stream)
+        sizeCut=0# taille de l'imputation 
+        indiceEnd=0# dernier indice de l'imputation 
         fonction_cut=[]
         length=0
         for row in csv_input:
             if(length>0):
                 if(row[1]==''):
                     fonction_cut.append(np.nan)
+                    sizeCut+=1
+                    indiceEnd = int(row[0])
+
                 else:
                     try:
                         float(row[1])
@@ -403,7 +429,13 @@ def prediction_courbe():
             print("La taille doit être de 50 et ne comporter qu'une liste")
             return render_template('courbes.html') 
         fonction_cut,fonction_reconstruite = reconstruction(fonction_cut)
+
     
+        type_courbe="sur-mesure csv"
+        indice_imputation=[indiceEnd-sizeCut,indiceEnd]
+        bruit= 0 
+
+
         #Reconstruction et prédiction données présélectionnées  
         globale_reconstruction=(np.array(fonction_reconstruite)).reshape(1,1,50)
         globale_cut=(np.array(fonction_cut)).reshape(50)
@@ -419,7 +451,7 @@ def prediction_courbe():
             fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
             fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
     
-        return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2)
+        return render_template('courbes.html',finale_prediction=finale_prediction,fonction_cut=fonction_cut2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit)
 
 
       
@@ -427,14 +459,14 @@ def prediction_courbe():
     # Choix 3                                  #
     # Données d'entrée sélectionnées à la main #
     ############################################
-    
+
     else:
-        print("Données d'entrée sélectionnées à la main",indice_type_saisie)
+        #print("Données d'entrée sélectionnées à la main",indice_type_saisie)
 
         #Request des données en POST 
         select_chart3 = request.form.getlist('chartSelect3')
 
-        indice_type_courbe3 = int( select_chart3[0])
+        indice_type_courbe3 = int(select_chart3[0])
 
         bruit = request.form.get("customRange3")
         bruit = int(bruit)
@@ -456,16 +488,40 @@ def prediction_courbe():
                     5 : [np.sin(2*np.pi*x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
                 }
         
-        print("indice_type_courbe3",indice_type_courbe3)
+        #str pour légende type de courbe penser à modifer lors d'ajout de nouveaux modèles. 
+        choix_type_courbe={
+                1 : "x**2",
+                2 : "exp(x)",
+                3 : "2x",
+                4 : "-sqrt(x)",
+                5 : "sin(x)",
+            }
+
+        #print("indice_type_courbe3",indice_type_courbe3)
+
         if(indice_type_courbe3!=6):
-           
+            
+          
             indice3 = request.form.get("indice3")
             taille3 = request.form.get("taille3")
-            indice3 = int(indice3)
-            taille3 = int(taille3)
+            
+            #condition erreur si les entrés ne sont pas des chiffres 
+            if  indice3.isdigit() and taille3.isdigit() :
+                indice3 = int(indice3)
+                taille3 = int(taille3)
+
+            else:
+                return render_template('courbes.html') 
+
+           
+            #cut courbe 
             y = choix_courbe.get(indice_type_courbe3,-1)
             fonction_cut3,fonction_reconstruite3=cut_courbe(y,indice3,taille3)
-        
+            
+            #Légende indice d'imputation et type de courbe 
+            indice_imputation = [indice3,indice3+taille3]
+            type_courbe=choix_type_courbe.get(indice_type_courbe3,-1)
+
         ##Reconstruction et prédiction données manuelles  
         globale_reconstruction3=(np.array(fonction_reconstruite3)).reshape(1,1,50)
         globale_cut3=(np.array(fonction_cut3)).reshape(50)
@@ -482,57 +538,7 @@ def prediction_courbe():
             fonction_reconstruite3_2[j]=(json.dumps(float(fonction_reconstruite3[j])))
 
 
-        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,fonction_reconstruite=fonction_reconstruite3_2,globale_cut=globale_cut3,globale_reconstruction=globale_reconstruction3)
+        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,type_courbe=type_courbe,indice_imputation=indice_imputation,modele=modelMSE,qte_bruit=bruit)
 
         
 
-#essayer de faire un def avec cxe smodèles prédifinis ici pour les utiliser ensuite dans predict 
-
-"""
-@app.route('/predict',methods=['POST'])
-def predict():
-   
-    #int_features = [int(j) for j in request.form.values()]
-    if (len(globale_reconstruction)!=0):
-
-        print("diff 0")
-
-        pred=modelMSE.predict(globale_reconstruction)
-
-        pred=pred.reshape(50)
-
-        
-        #x_part 
-        #oneX_part=x_part[int_features]
-        #oneX_part=oneX_part.reshape(50)
-        #newCourbe = np.array(oneX_part)
-
-        #Nouvelle courbe prédite 
-        predictionCourbe = np.full(50,np.nan)
-        #onePredictionCourbe = predictionCourbe[int_features].reshape(50)
-
-        prediction=[0]*len(pred)
-        test=[]
-
-        #remplacer les valeurs pour faire une seule et unique courbe à plot 
-        for j in range(50):
-            if(j+1<49):
-                if (np.isnan(globale_cut[j+1]) ):
-                    predictionCourbe[j] = globale_cut[j]
-            if(j-1>0):
-                if (np.isnan(globale_cut[j-1])):
-                    predictionCourbe[j] = globale_cut[j]
-            if (np.isnan(globale_cut[j])):
-                #newCourbe[j] = pred[j]
-                predictionCourbe[j] = pred[j]
-            
-            #Formater les données en json float pour les lire dans le chart en js 
-            prediction[j]=json.dumps(float(predictionCourbe[j]))
-            #test.append(json.dumps(float(globale_cut[j])))
-            
-            #newCourbe[j]=json.dumps(float(newCourbe[j]))
-  
-        return render_template('courbes.html', output_prediction_python=prediction)
-    print("liste vide 0")
-    return render_template('courbes.html')
-"""
