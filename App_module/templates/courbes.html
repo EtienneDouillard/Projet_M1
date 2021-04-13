@@ -80,7 +80,7 @@
       .container2{
         background-color: #fff;
         min-width: 100%;
-     
+      
         text-align: center;
       }
       .container2 h2{
@@ -88,39 +88,45 @@
       }
       #chartPredict{
         text-align: center;
-       
-     
+              
         font-size: 1rem;
         background-color: white;
       }
-    
-    #form {
-      text-align: justify;
-      margin: 3%;
-    }
 
-    #select{
-      width: 20%;
-      height: 20%;
-      background-color: white;
-
-      margin: auto;
-      border-radius: 5px;
-    }
+      #img_modele{
+        text-align: center;
+        margin:auto;
+        width: 80%;
 
 
-    .form-part {
-      text-align: left;
-      margin: 2px;
-      color: white;
-      display: none;
-    }
+      }
+      #form {
+        text-align: justify;
+        margin: 3%;
+      }
 
-    #form[data-choice="1"] .p1, 
-    #form[data-choice="2"] .p2, 
-    #form[data-choice="3"] .p3{
-        display: block;
-    }
+      #select{
+        width: 20%;
+        height: 20%;
+        background-color: white;
+
+        margin: auto;
+        border-radius: 5px;
+      }
+
+
+      .form-part {
+        text-align: left;
+        margin: 2px;
+        color: white;
+        display: none;
+      }
+
+      #form[data-choice="1"] .p1, 
+      #form[data-choice="2"] .p2, 
+      #form[data-choice="3"] .p3{
+          display: block;
+      }
       
     </style>
 
@@ -181,18 +187,23 @@
                   <h5>Choisir un type de fonction</h5> 
                     <select id="chartSelect"  name="chartSelect1" >
                       <option value="5">Ma liste</option>
-                      <option value="1">x*x</option>
-                      <option value="2">exp(x)</option>
-                      <option value="3">2x</option>
-                      <option value="4">-sqrt(x)</option>
-                      <option value="5">sin(x)</option>
+                      <option value="1">x**2</option>
+                      <option value="2">x**5 - x**3</option>
+                      <option value="3">-exp(x)</option>
+                      <option value="4">2*exp(x)</option>
+                      <option value="5">2*(x)</option>
+                      <option value="6">-sqrt(x)</option>
+                      <option value="7">+sqrt(x)</option>
+                      <option value="8">sin(x)</option>
+                      <option value="9">cos(x)</option>
+                      <option value="10">-tan(x)</option>
                     </select>
                 </div>
                 <br>
                 <br>
                 <div id="choix_type_cut">
                   <h5>Choisir un type d'imputation</h5> 
-                    <select id="imputationSelect"  name="imputationSelect" >
+                    <select id="imputationSelect"  name="imputationSelect">
                       <option value="1">0-10</option>
                       <option value="2">10-18</option>
                       <option value="3">18-27</option>
@@ -235,23 +246,32 @@
                 <h5>Choisir un type de fonction </h5> 
                 <select id="chartSelect"  name="chartSelect3" >
                   <option value="5">Ma liste</option>
-                  <option value="1">x*x</option>
-                  <option value="2">exp(x)</option>
-                  <option value="3">2*(x)</option>
-                  <option value="4">-sqrt(x)</option>
-                  <option value="5">sin(x)</option>
+                  <option value="1">x**2</option>
+                  <option value="2">x**5 - x**3</option>
+                  <option value="3">-exp(x)</option>
+                  <option value="4">2*exp(x)</option>
+                  <option value="5">2*(x)</option>
+                  <option value="6">-sqrt(x)</option>
+                  <option value="7">+sqrt(x)</option>
+                  <option value="8">sin(x)</option>
+                  <option value="9">cos(x)</option>
+                  <option value="10">-tan(x)</option>
                 </select>
               </div>
               <br>
               <br>          
-              <h5>Saisir un indice pour le début de l'imputation :</h5> 
-              <input type="text" name="indice3" value="10" />
+              <h5>Saisir un indice* pour le début de l'imputation : </h5> 
+            
+              <input type="text" name="indiceStart3" value="10" />
               <br>
               <br>
-              <h5>Saisir une taille d'imputation :</h5> 
-              <input type="text" name="taille3" value="12" />
+              <h5>Saisir un indice* pour la fin de l'imputation : </h5> 
+         
+              <input type="text" name="indiceStop3" value="20" />
               <br>
-              <br>
+
+              <p>*indice entre 0 et 50 </p>
+              
               <h5>Saisir une quantité de bruit :</h5> 
               <input type="range" style="width:80%" class="form-range" name="customRange3" value="0"/>
               <br>
@@ -282,22 +302,75 @@
     <div class="container2">
       <h2 id="titre3"> Reconstruction : </h2> <br>
       <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.   </h5>
-      <h5>Modèle utilisé : {{modele}}</h5>
+    
       <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
         <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
       </div>
       <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
-  </div>
+      <h5> Modèle utilisé :  </h5>
+      <!-- <img id="img_modele" src="{{url_for('static', filename= 'img/modeleFixe0.png' ) }}" />
+      -->
+
+      <img id="img_modele1" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
+      <img id="img_modele2" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
+      <img id="img_modele3" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
+
+
+
+     
+      
+      <br>
+      <br>
+
+    </div>
   
 
   <script type="text/javascript">
+    
+
     var list_data = {{ finale_prediction|default("")|tojson }} //Redefined here as a js variable
     var list_data_input = {{ fonction_cut|default("")|tojson }}
 
-    
+
     window.onload = function () { chart_input(); chart_predict(); };
 
+  
+    var indice_modele =  {{ modele|default("")|tojson }}
+    indice_modele= parseFloat(indice_modele)
+  
+    console.log(" indice_modele =", indice_modele)
 
+    switch (indice_modele) {
+      case 1:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
+        break;
+      case 2:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
+        break;
+      case 3:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
+        break;
+      case 4:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
+        break; 
+      case 5:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
+        break;  
+      case 6:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
+        break;
+      case 7:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modele1.png')}}";
+        document.getElementById("img_modele2").src = "{{url_for('static',filename='img/modele2.png')}}";
+        document.getElementById("img_modele3").src = "{{url_for('static',filename='img/modele3.png')}}";
+
+        break;
+
+      default:
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_0.png')}}";
+      }
+
+    
 
       
     function chart_predict(){
@@ -331,7 +404,7 @@
        
         for (let i = 0; i < 50; i++){
             input_data[i]=parseFloat(list_data_input[i])   
-            console.log(input_data[i])
+            
         }
         
         var data = {
