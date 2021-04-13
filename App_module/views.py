@@ -4,7 +4,6 @@ from flask import Flask ,flash, render_template,jsonify,request, send_file,url_f
 
 from flask_sqlalchemy import SQLAlchemy 
 
-from sklearn.metrics import mean_squared_error
 from tensorflow.keras.utils import plot_model
 from tensorflow import keras
 import tensorflow as tf
@@ -106,7 +105,6 @@ def prediction(modele,globale_reconstruction,globale_cut):
     pred=pred.reshape(50)
     #print("pred=",pred)
     
-    MSE = mean_squared_error(globale_reconstruction,pred)
     #Nouvelle courbe prédite 
     predictionCourbe = np.full(50,np.nan)
     finale_prediction=[0]*len(pred)
@@ -251,11 +249,6 @@ def envoie():
 
 
 
-@app.route('/App_module/templates/about.html')
-def about(): 
-    return render_template('about.html')
-
-
 
 @app.route('/App_module/templates/navbar.html')
 def navbar(): 
@@ -363,7 +356,7 @@ def prediction_courbe():
         
             #choix du modèle en fonction de l'indice d'imputation 
             print("indice_imputationSelect",indice_imputationSelect)
-            modele_preselection=choix_modele.get(indice_imputationSelect,-1)
+            modele_preselection1=choix_modele.get(indice_imputationSelect,-1)
             
             #Légende type de courbe 
             type_courbe=choix_type_courbe.get(indice_type_courbe1,-1)
@@ -390,7 +383,7 @@ def prediction_courbe():
         globale_cut1=(np.array(fonction_cut1)).reshape(50)
 
         #appel de la fonction predict avec le modele spécial en fonction de l'imputation. 
-        finale_prediction1=prediction(modele_preselection,globale_reconstruction1,globale_cut1)
+        finale_prediction1=prediction(modele_preselection1,globale_reconstruction1,globale_cut1)
 
         #Données fonctionnelles reconstruites suite aux données présélectionnées 
         fonction_cut1_2=[0]*(len(fonction_cut1))

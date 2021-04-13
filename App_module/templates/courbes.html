@@ -93,10 +93,10 @@
         background-color: white;
       }
 
-      #img_modele{
+      #img_modele1{
         text-align: center;
         margin:auto;
-        width: 80%;
+        width: 100%;
 
 
       }
@@ -146,7 +146,6 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
             <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">Notre technologie<span class="sr-only">(current)</span></a>
-            <a class="nav-item nav-link active" href="{{ url_for('about')}}">A propos</a>
             <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
             <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
         </div>
@@ -155,7 +154,7 @@
   
   <div id="titre">
     <h1>Application du réseau de neurones</h3>
-    <p>Facile. Pratique.</p>
+
   </div>
 
   <div class="container">
@@ -228,7 +227,8 @@
               <h4>Données d'entrée depuis un fichier csv </h4>
               
               <br>
-              <h5>Ma liste : (Fichier csv: 'liste' --> 50 points)</h5>
+              <h5>(liste de données de 50 points)</h5>
+              <h6>Exemple de fichier CSV <a href="https://drive.google.com/file/d/11854-s1B1ryNyESC7UrOpV37mt5Pxyse/view?usp=sharing">ici</a></h6>
               
               <br>
               <input type="file" accept=".csv" name="fichierCSV">
@@ -312,8 +312,7 @@
       -->
 
       <img id="img_modele1" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
-      <img id="img_modele2" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
-      <img id="img_modele3" src="{{url_for('static',filename='img/modeleFixe_0.png')}}" />
+
 
 
 
@@ -360,9 +359,8 @@
         document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
         break;
       case 7:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modele1.png')}}";
-        document.getElementById("img_modele2").src = "{{url_for('static',filename='img/modele2.png')}}";
-        document.getElementById("img_modele3").src = "{{url_for('static',filename='img/modele3.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+      
 
         break;
 

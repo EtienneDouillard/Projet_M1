@@ -44,11 +44,19 @@
           color: #259422;
       }
       .description p {
-          color: #000;
-          font-size: 1.3rem;
-          line-height: 1.5;
+        color: #000;
+        font-size: 1.3rem;
+        line-height: 1.5;
       }
 
+      #titre_about {
+        padding:2em;
+        text-align: center;
+      }
+    
+      .rectangle{
+        position:hidden;
+      }
       #presentation {
         min-width: 100%;
         background-color: #243C54;
@@ -144,8 +152,6 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
               <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">Notre technologie <span class="sr-only">(current)</span></a>
-
-              <a class="nav-item nav-link active" href="{{ url_for('about')}}">A propos</a>
               <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
               <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
             
@@ -170,8 +176,11 @@
           <img src="{{ url_for('static',filename='img/about_us_2.jpg') }}">
         </div>
         <div class="col-sm-5 textPresentation">
-          <a href="{{ url_for('about')}}"><h3>Qui somme-nous</h3></a>
-          <p>Nous sommes un groupe d'étudiants ingénieurs à l'ISEN de Nantes. Nous présentons sur ce site web un projet de Master 1 : <b>Reconstruction via apprentissage profond pour des données fonctionnelles partielles.   </b> 
+          <a href="{{ url_for('equipe')}}"><h3>Qui somme-nous</h3></a>
+          <br>
+          <p>Nous sommes deux étudiants ingénieurs à l'ISEN de Nantes. Nous présentons sur ce site web un projet de Master 1 : </p>
+          <p>
+          <b>Reconstruction via apprentissage profond pour des données fonctionnelles partielles.   </b> 
           </p>
           <p> Le but de ce projet est de reconstruire des données fonctionnelles partielles à l’aide de deep learning. Nous reconstruisons les parties manquantes (ou non observées) de fonctions à l’aide de leurs parties observées. Pour cela, nous utilisons un réseau de neurones du type RNN préalablement entraîné sur des jeux de données simulées.
             .</p>
@@ -183,12 +192,24 @@
       <img src="{{url_for('static',filename='img/courbe_1.jpg')}}" class="container-fluid notreTechnologie">
       <div class="overlay_technologie">
         <div class="description_technologie">
-          <a href="{{url_for('courbes')}}"><h3>Tester notre technologie de reconstruction</h3></a><br>
-          <p classe="ssTitre">Facile. Rapide.</p><br>
-          <p>Contactez-nous pour plus d'informations.</p>
+          <a href="{{url_for('courbes')}}"><h3>Testez la technologie de reconstruction</h3></a>
+          <br>
+          <h5> <a href="{{url_for('contact')}}"> Contactez-nous pour plus d'informations</a></h5>
+
         </div>
       </div>
     </div>
+    <div id="titre_about">
+      <h3>A propos</h3>
+   <br>
+      <div classe="rectangle">
+          <p>Ce projet a été proposé par Matthieu Saumard enseignant chercheur en mathématiques à l’ISEN de Nantes. Plusieurs sous-objectifs ont été réalisés pendant ces trois mois de projets. Des livrables finaux sont disponibles en annexe du rapport. 
+              Le projet a pour objectif de reconstruire des données fonctionnelles à l’aide de deep learning. Les données sont simulées  partiellement afin de reconstruire des données fonctionnelles  complètes. La reconstruction est  possible à l’aide d’un réseau de neurones préalablement entraîné sur des jeux de données simulées. Ce projet est une jonction entre le domaine de l’analyse de données fonctionnelles, celui des techniques neuronales et le développement web avec l'application.
+          </p>
+          <br>
+          <h4>Lisez notre rapport de projet en cliquant <a href="https://docs.google.com/document/d/1FT4f9Ol7H8VYbwmNaXh5hZkbqmaOV5GrmZtoeqtesnY/edit?usp=sharing">ici</a></h4>
+      </div>
+  </div>
     
     <div id="citation">
       <div>"La meilleure façon de prévénir l'avenir est de la créer"</div>

@@ -42,7 +42,7 @@
         color: #259422;
       }
       #contact p{
-        text-align:right;
+        text-align:center;
         color: #fff;
       }
 
@@ -60,6 +60,7 @@
 
       a{
         color:#fff;
+        text-align: center;
       }
 
       
@@ -76,8 +77,6 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
               <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">Notre technologie <span class="sr-only">(current)</span></a>
-
-              <a class="nav-item nav-link active" href="{{ url_for('about')}}">A propos</a>
               <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
               <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
             
@@ -87,7 +86,7 @@
 
     <div id="titre">
       <h1>Comment nous contacter</h3>
-      <p>Dynamique. Attentif.</p>
+
     </div>
     
     <div id="contact" class="container">
@@ -96,8 +95,8 @@
           <h5>Adresse</h5>
           <p>15 avenue du Champ de Manoeuvre, 44470 Carquefou</p><br>
           <h5>Email</h5>
-          <a href="mailto:thomas.bontemps@isen-ouest.yncrea.fr"><p>thomas.bontemps@isen-ouest.yncrea.fr</p></a>
-          <a href="mailto:etienne.douillard@isen-ouest.yncrea.fr"><p>etienne.douillard@isen-ouest.yncrea.fr</p></a>
+          <a href="mailto:thomas.bontemps@isen-ouest.yncrea.fr"><p>thomas.bontemps@isen-ouest.yncrea.fr</p> </a>
+          <a href="mailto:etienne.douillard@isen-ouest.yncrea.fr"><p>etienne.douillard@isen-ouest.yncrea.fr </p></a>
 
         </div>
         <div class="col-sm-8">
@@ -105,23 +104,6 @@
         </div>
       </div>
     </div>
-    <div class="row" id="formulaire">
-      <FORM method="POST" action="envoi.php">
-      <div class="row largeur">
-          <div class="col-sm-6">
-            <P>Votre nom: <br>
-            <INPUT type="text" class="form-control" name="nom" >
-            </p>
-          </div>
-          <div class="col-sm-6">
-            <P>Votre adresse E-Mail:<br>
-            <INPUT type="text" class="form-control" name="email" >
-            </p>
-          </div>
-      </div>
-      <P>Message:<br>
-      <textarea name="message" class="form-control" cols=100% rows=5></textarea>
-      </p><INPUT type="submit" class="btn btn-secondary" value="Envoyer">
-    </div>
+    
   </body>
 </html>
