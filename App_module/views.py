@@ -1,13 +1,8 @@
 #route de l'application
 
 from flask import Flask ,flash, render_template,jsonify,request, send_file,url_for
-
-from flask_sqlalchemy import SQLAlchemy 
-
-from tensorflow.keras.utils import plot_model
 from tensorflow import keras
 import tensorflow as tf
-import pandas as pd
 import numpy as np
 import itertools
 import pickle
@@ -15,19 +10,8 @@ import random
 import json
 import io
 import csv
-import os
 
 
-"""
-dTest = pd.read_csv('App_module//test10000.csv')
-dataTest = pd.DataFrame(data=dTest) #création nouvelle dataframe
-x_test = dataTest['x_test']
-y_test = dataTest['y_test']
-lengthTest = int(len(x_test)/50)
-x_test = np.array(x_test).reshape(lengthTest,1,50)
-y_test = np.array(y_test).reshape(lengthTest,1,50)
-
-"""
 
 ########################################################
 ######################  Init  ##########################
@@ -111,21 +95,6 @@ def prediction(modele,globale_reconstruction,globale_cut):
 
     #remplacer les valeurs pour faire une seule et unique courbe à plot 
  
-   
-    """
-    for j in range(50):
-        
-
-        if(j+1<49):
-            if (np.isnan(globale_cut[j+1]) ):
-                predictionCourbe[j] = globale_cut[j]
-        if(j-1>0):
-            if (np.isnan(globale_cut[j-1])):
-                predictionCourbe[j] = globale_cut[j]
-        if (np.isnan(globale_cut[j])):
-            predictionCourbe[j] = pred[j]
-        finale_prediction[j]=json.dumps(float(predictionCourbe[j]))
-    """
   
     calcul_diff=0
     
@@ -219,38 +188,38 @@ def index():
 def application(): 
     return render_template('NosGestClimat.html')
 
-@app.route('/App_module/templates/accueil.html')
+@app.route('/accueil')
 def accueil(): 
     return render_template('accueil.html')
 
 
 
-@app.route('/App_module/templates/contact.html')
+@app.route('/contact')
 def contact(): 
     return render_template('contact.html')
 
 
 
-@app.route('/App_module/templates/courbes.html')
+@app.route('/courbes')
 def courbes(): 
     return render_template('courbes.html')
 
 
 
-@app.route('/App_module/templates/equipe.html')
+@app.route('/equipe')
 def equipe(): 
     return render_template('equipe.html')
 
 
 
-@app.route('/App_module/templates/envoie.html')
+@app.route('/envoie')
 def envoie(): 
     return render_template('envoie.html')
 
 
 
 
-@app.route('/App_module/templates/navbar.html')
+@app.route('/navbar')
 def navbar(): 
     return render_template('navbar.html')
 
@@ -347,10 +316,11 @@ def prediction_courbe():
              #Choix des modeles possibles en fonction de l'imputation 
             choix_modele ={
                     1 : modeleFixe0,
-                    2 : modeleFixe0,
-                    3 : modeleFixe0,
-                    4 : modeleFixe0,
-                    5 : modeleFixe0,                
+                    2 : modeleFixe10,
+                    3 : modeleFixe18,
+                    4 : modeleFixe27,
+                    5 : modeleFixe36,
+                    6 : modeleFixe45,                
             }
 
         
