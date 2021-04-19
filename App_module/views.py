@@ -11,6 +11,10 @@ import json
 import io
 import csv
 
+from google.api_core.client_options import ClientOptions
+from googleapiclient import discovery
+from google.cloud import storage
+
 
 
 ########################################################
@@ -63,17 +67,6 @@ x2 = 50*np.sqrt(np.exp(-((k_vec)^2)/5)) * np.random.normal(size=50)
 
 app = Flask(__name__)
 
-modelMSE = keras.models.load_model('modeles\Algo_modeles_Reconstruit_FinalV3_1\modelMSE')
-
-#modelMSE = keras.models.load_model('modeles\MSE_modele\modelMSE')
-
-
-modeleFixe0 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice0\modelMSE')
-modeleFixe10 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice10\modelMSE')
-modeleFixe18 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice18\modelMSE')
-modeleFixe27 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice27\modelMSE')
-modeleFixe36 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice36\modelMSE')
-modeleFixe45 = keras.models.load_model('modeles\Bests_algo_modelesFixe_indice45\modelMSE')
 
 
 fonction_reconstruite=[]
@@ -81,21 +74,35 @@ fonction_reconstruite=[]
 ######################  Def  ############################
 #########################################################    
 
-def prediction(modele,globale_reconstruction,globale_cut):
+def prediction(globale_reconstruction,globale_cut):
 
-    #print("globale_reconstruction=",globale_reconstruction)
-    pred=modele.predict(tf.keras.utils.normalize(globale_reconstruction))
+    ##Connection au serveur 
+    endpoint = 'https://us-central1-ml.googleapis.com'
+    client_options = ClientOptions(api_endpoint=endpoint)
+    ml = discovery.build('ml', 'v1', client_options=client_options)
 
-    pred=pred.reshape(50)
-    #print("pred=",pred)
-    
+    #Normalisation des données d'entrée 
+    input_array=tf.keras.utils.normalize(globale_reconstruction)
+    #print('input_array=',input_array)
+    #input=json.dumps(list(input_array))
+    #print('input=',input)
+
+    #Requête en Json 
+    request_body = { 'instances': input_array.tolist() }
+    #prédiction au serveur 
+    request2 = ml.projects().predict(name='projects/neurofifty-310814/models/final_modele',body=request_body)
+    #retour de la prédiction 
+    reponse = request2.execute()
+    pred=reponse["predictions"]
+    #Passage en array pour reshape [[[50]]] en [50]
+    pred=np.array(pred).reshape(50)
+   
     #Nouvelle courbe prédite 
     predictionCourbe = np.full(50,np.nan)
     finale_prediction=[0]*len(pred)
 
     #remplacer les valeurs pour faire une seule et unique courbe à plot 
  
-  
     calcul_diff=0
     
     if not np.isnan(globale_cut[0]):
@@ -110,7 +117,7 @@ def prediction(modele,globale_reconstruction,globale_cut):
             if (np.isnan(globale_cut[j+1]) and calcul_diff==0 ):
                 
                 diff = pred[j]-globale_cut[j]
-                print("diff",diff)
+                #print("diff",diff)
                 calcul_diff=1
                 predictionCourbe[j] = globale_cut[j]
         if(j-1>0):       
@@ -226,7 +233,7 @@ def navbar():
 
 @app.route('/prediction_courbe',methods=['POST'])
 def prediction_courbe():
-
+   
     #requètes POST du type de saisie de données lors du sibmit du formulaire. 
     select = request.form.getlist("select")
 
@@ -246,44 +253,59 @@ def prediction_courbe():
         #print("Données préselection",indice_type_saisie)
         #Request des données en POST 
         select_chart1 = request.form.getlist('chartSelect1')
+        #Requête des fréquences 
+        freq1=request.form.get("frequence1")
+        freq2=request.form.get("frequence2")
+        #Requête du bruit 
         bruit = request.form.get("customRange1")
+        
+        #Passage en int 
         indice_type_courbe1 = int(select_chart1[0])
-
-        #print(indice_type_courbe1)
-
-       
         bruit = int(bruit)
+        freq1 = int(freq1)
+        freq2 = int(freq2)
+        if (freq1 != 0 and freq2 != 0):#Condition pour avoir de la fréquence 
+            freq1=freq1/10
+            freq2=freq2/10
        
-        if (bruit==0):
-            choix_courbe = {    
-                    1 : [(x/50)**2 for x in range(50)],
-                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
-                    3 : [-np.exp(x/50) for x in range(50)],
-                    4 : [2*np.exp(x/50) for x in range(50)],
-                    5 : [2*(x/50) for x in range(50)],
-                    6 : [-np.sqrt(x/50) for x in range(50)],
-                    7 : [np.sqrt(x/50) for x in range(50)],
-                    8 : [np.sin(2*np.pi*x/50) for x in range(50)],
-                    9 : [np.cos(2*np.pi*x/50) for x in range(50)],
-                    10 : [-np.tan(x/50) for x in range(50)],
-                    }
+            if (bruit==0):
+            
+                choix_courbe = {    
+                        1 : [(x/50)**2 for x in range(50)],
+                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
+                        3 : [-np.exp(x/50) for x in range(50)],
+                        4 : [2*np.exp(x/50) for x in range(50)],
+                        5 : [2*(x/50) for x in range(50)],
+                        6 : [-np.sqrt(x/50) for x in range(50)],
+                        7 : [np.sqrt(x/50) for x in range(50)],
+                        8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)],
+                        9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)],
+                        10 : [-np.tan(freq1*(x/50)) for x in range(50)],
+                        11 : [(np.cos(freq1*np.pi*x/50)+ np.sin(freq2*np.pi*x/50)) for x in range(50)],
+                        }
 
+            else:
+                choix_courbe = {    
+                        1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        10 : [-np.tan(freq1*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    }
         else:
-            choix_courbe = {    
-                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    8 : [np.sin(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    9 : [np.cos(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    10 : [-np.tan(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                }
+            return "Choisir fréquence > 0"
         
-        
-        if(indice_type_courbe1!=7):
+        if(indice_type_courbe1!=12):
+            #Vérification de la fréquence pour afficher la bonne : 
+            if (indice_type_courbe1!=8 and indice_type_courbe1!=9 and indice_type_courbe1!=10 and indice_type_courbe1!=11 ):
+                freq1=0
+                freq2=0
            
             imputationSelect=request.form.getlist('imputationSelect')
 
@@ -312,27 +334,29 @@ def prediction_courbe():
                     8 : "sin(x)",
                     9 : "cos(x)",
                     10 : "tan(x)", 
+                    11 : "co(x) + sin(x)"
                 }
              #Choix des modeles possibles en fonction de l'imputation 
             choix_modele ={
-                    1 : modeleFixe0,
-                    2 : modeleFixe10,
-                    3 : modeleFixe18,
-                    4 : modeleFixe27,
-                    5 : modeleFixe36,
-                    6 : modeleFixe45,                
+                    1 : 1,
+                    2 : 2,
+                    3 : 3,
+                    4 : 4,
+                    5 : 5,
+                    6 : 6,                
             }
 
         
             #choix du modèle en fonction de l'indice d'imputation 
-            print("indice_imputationSelect",indice_imputationSelect)
+            #print("indice_imputationSelect",indice_imputationSelect)
+
             modele_preselection1=choix_modele.get(indice_imputationSelect,-1)
             
             #Légende type de courbe 
             type_courbe=choix_type_courbe.get(indice_type_courbe1,-1)
 
             #légende indice d'imputation 
-            if (indice_imputationSelect != 11):
+            if (indice_imputationSelect != 6):
                 indiceStart = choix_imputation.get(indice_imputationSelect,-1)
                 indiceEnd = choix_imputation.get((indice_imputationSelect+1),-1)
                 indice_imputation = [indiceStart,indiceEnd]
@@ -345,7 +369,9 @@ def prediction_courbe():
             #Fonction cut d'entrée 
             y = choix_courbe.get(indice_type_courbe1,-1)
             fonction_cut1,fonction_reconstruite1=cut_courbe(y,indiceStart,indiceEnd-indiceStart)
-       
+
+        else:
+            return render_template('courbes.html')
        
 
         #Reconstruction et prédiction données manuelles  
@@ -353,7 +379,7 @@ def prediction_courbe():
         globale_cut1=(np.array(fonction_cut1)).reshape(50)
 
         #appel de la fonction predict avec le modele spécial en fonction de l'imputation. 
-        finale_prediction1=prediction(modele_preselection1,globale_reconstruction1,globale_cut1)
+        finale_prediction1=prediction(globale_reconstruction1,globale_cut1)
 
         #Données fonctionnelles reconstruites suite aux données présélectionnées 
         fonction_cut1_2=[0]*(len(fonction_cut1))
@@ -367,7 +393,7 @@ def prediction_courbe():
         #choix type modèle 
         indice_modele=json.dumps(indice_imputationSelect)
 
-        return render_template('courbes.html',finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=indice_modele)
+        return render_template('courbes.html',finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=indice_modele,frequence1=freq1,frequence2=freq2)
 
         
     ################
@@ -413,7 +439,7 @@ def prediction_courbe():
         globale_reconstruction=(np.array(fonction_reconstruite)).reshape(1,1,50)
         globale_cut=(np.array(fonction_cut)).reshape(50)
 
-        finale_prediction=prediction(modelMSE,globale_reconstruction,globale_cut)
+        finale_prediction=prediction(globale_reconstruction,globale_cut)
 
         #données fonctionnelles reconstruites suite auc données préselectionnées 
         fonction_cut2=[0]*(len(fonction_cut))
@@ -440,40 +466,55 @@ def prediction_courbe():
 
         #Request des données en POST 
         select_chart3 = request.form.getlist('chartSelect3')
-
-        indice_type_courbe3 = int(select_chart3[0])
-
         bruit = request.form.get("customRange3")
+        #Requête des fréquences 
+        freq1=request.form.get("frequence1")
+        freq2=request.form.get("frequence2")
+    
+        #Passage en int 
+        indice_type_courbe3 = int(select_chart3[0])
         bruit = int(bruit)
-       
-        if (bruit==0):
-            choix_courbe = {    
-                    1 : [(x/50)**2 for x in range(50)],
-                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
-                    3 : [-np.exp(x/50) for x in range(50)],
-                    4 : [2*np.exp(x/50) for x in range(50)],
-                    5 : [2*(x/50) for x in range(50)],
-                    6 : [-np.sqrt(x/50) for x in range(50)],
-                    7 : [np.sqrt(x/50) for x in range(50)],
-                    8 : [np.sin(2*np.pi*x/50) for x in range(50)],
-                    9 : [np.cos(2*np.pi*x/50) for x in range(50)],
-                    10 : [-np.tan(x/50) for x in range(50)],
-                    }
-
-        else:
-            choix_courbe = {    
-                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    8 : [np.sin(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    9 : [np.cos(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                    10 : [-np.tan(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/500)),
-                }
+        freq1 = int(freq1)
+        freq2 = int(freq2)
+        if (freq1 != 0 and freq2 != 0):#Condition pour avoir de la fréquence 
+            freq1=freq1/10
+            freq2=freq2/10
+    
+            if (bruit==0):
+            
+                choix_courbe = {    
+                        1 : [(x/50)**2 for x in range(50)],
+                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
+                        3 : [-np.exp(x/50) for x in range(50)],
+                        4 : [2*np.exp(x/50) for x in range(50)],
+                        5 : [2*(x/50) for x in range(50)],
+                        6 : [-np.sqrt(x/50) for x in range(50)],
+                        7 : [np.sqrt(x/50) for x in range(50)],
+                        8 : [np.sin(2*np.pi*x/50) for x in range(50)],
+                        9 : [np.cos(2*np.pi*x/50) for x in range(50)],
+                        10 : [-np.tan(x/50) for x in range(50)],
+                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)],
         
+                        }
+                    
+
+            else:
+                choix_courbe = {    
+                        1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        8 : [np.sin(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        9 : [np.cos(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        10 : [-np.tan(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    }
+        else:
+            return "Choisir fréquence > 0"
+
         #str pour légende type de courbe penser à modifer lors d'ajout de nouveaux modèles. 
         choix_type_courbe={
                     1 : "x**2",
@@ -486,23 +527,34 @@ def prediction_courbe():
                     8 : "sin(x)",
                     9 : "cos(x)",
                     10 : "tan(x)", 
+                    11 : "co(x) + sin(x)",
                 }
 
         #print("indice_type_courbe3",indice_type_courbe3)
 
-        if(indice_type_courbe3!=11):
-            
+        if(indice_type_courbe3!=12):
+            if (indice_type_courbe3!=8 and indice_type_courbe3!=9 and indice_type_courbe3!=10 and indice_type_courbe3!=11 ):
+                freq1=0
+                freq2=0
           
             indiceStart3 = request.form.get("indiceStart3")
             indiceStop3 = request.form.get("indiceStop3")
+            
+
+
             
             #condition erreur si les entrés ne sont pas des chiffres 
             if  indiceStart3.isdigit() and indiceStop3.isdigit() :
                 indiceStart3 = int(indiceStart3)
                 indiceStop3 = int(indiceStop3)
-
+                
             else:
-                return render_template('courbes.html') 
+                return "Entrer des chiffres sur les indices d'imputation"
+
+            if indiceStart3>indiceStop3 :
+                return "Choisir un indice départ < inidice de fin " 
+
+            
 
            
             #cut courbe 
@@ -513,11 +565,13 @@ def prediction_courbe():
             indice_imputation = [indiceStart3,indiceStop3]
             type_courbe=choix_type_courbe.get(indice_type_courbe3,-1)
 
+        else:
+            return render_template('courbes.html')
         ##Reconstruction et prédiction données manuelles  
         globale_reconstruction3=(np.array(fonction_reconstruite3)).reshape(1,1,50)
         globale_cut3=(np.array(fonction_cut3)).reshape(50)
 
-        finale_prediction3=prediction(modelMSE,globale_reconstruction3,globale_cut3)
+        finale_prediction3=prediction(globale_reconstruction3,globale_cut3)
 
         #données fonctionnelles reconstruites suite auc données manuelles 
         fonction_cut3_2=[0]*(len(fonction_cut3))
@@ -534,7 +588,9 @@ def prediction_courbe():
         
 
 
-        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,type_courbe=type_courbe,indice_imputation=indice_imputation,modele=7,qte_bruit=bruit)
+        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,type_courbe=type_courbe,indice_imputation=indice_imputation,modele=7,qte_bruit=bruit,frequence1=freq1,frequence2=freq2)
 
         
 
+if __name__ == "__main__":
+    app.run(debug=True)

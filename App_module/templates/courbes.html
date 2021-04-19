@@ -34,6 +34,17 @@
         text-align: center;
         font-size: 1.3rem;
       }
+      #legende1{
+        margin:0;
+        color: #259422;
+
+      }
+      #legende2{
+        margin:0;
+        color: brown;
+
+      }
+      
 
       .container{
         background-color: #243C54;
@@ -45,8 +56,61 @@
         margin:2rem;
         color: #50e632;
         margin-bottom:2%;
-      
       }
+      #consignes{
+        text-align: justify;
+        margin-left: 2%;
+        margin-right: 5%;
+        color: white;
+      }
+      
+      #chartSelect{
+        border-radius: 5px;
+        width: 50%;
+        margin-top: 5%;
+      }
+      #chartSelect option
+      {
+          color:brown;
+      }
+   
+      #chartSelect option[value="2"]
+      {
+        color:#259422;
+      }
+      #chartSelect option[value="6"]
+      {
+        color:#259422;
+      }
+      #chartSelect option[value="11"]
+      {
+        color:#259422;
+      }
+
+      #chartSelect3{
+        border-radius: 5px;
+        width: 50%;
+        margin-top: 5%;
+      }
+      #chartSelect3 option
+      {
+          color:brown;
+      }
+   
+      #chartSelect3 option[value="2"]
+      {
+        color:#259422;
+      }
+      #chartSelect3 option[value="6"]
+      {
+        color:#259422;
+      }
+      #chartSelect3 option[value="11"]
+      {
+        color:#259422;
+      }
+     
+      
       .formulaireNote{
         margin: 3%;
         color: #fff;
@@ -65,12 +129,7 @@
         font-size: 1rem;
         background-color: white;
       }
-      #chartSelect{
-        border-radius: 5px;
-        width: 50%;
-        margin-top: 5%;
-    
-      }
+   
       #imputationSelect{
         border-radius: 5px;
         width: 50%;
@@ -91,7 +150,16 @@
               
         font-size: 1rem;
         background-color: white;
+      
       }
+      .ct-chart .ct-series-b .ct-line {
+        stroke: black; 
+      }
+      .ct-chart .ct-series-b .ct-point {
+        stroke: black;
+    
+      }
+
 
       #img_modele1{
         text-align: center;
@@ -113,7 +181,7 @@
         margin: auto;
         border-radius: 5px;
       }
-
+  
 
       .form-part {
         text-align: left;
@@ -127,6 +195,8 @@
       #form[data-choice="3"] .p3{
           display: block;
       }
+
+    
       
     </style>
 
@@ -160,17 +230,24 @@
   <div class="container">
     <div class="row">
       <h3 id="titre2">Choisir un format de saisie de données :</h3>
+      <h4 id="consignes"> Utilisez le forumaire ci-dessous pour créer une nouvelle donnée fonctionnelle d'entrée . Ciquez sur le bouton vert pour reconstrurie et visualiser cette donnée. </h4>
     </div>
+    
+
+
     
     <form id="form" action="{{ url_for('prediction_courbe')}}" enctype="multipart/form-data"  method="post">
       <br>
       <br>
+      
       <select name="select" id="select" onchange="this.parentNode.dataset.choice = this.value;">
         <option value="0">Make a choice</option>
-        <option value="1">Données présélectionnées</option>
-        <option value="2">Fichier CSV</option>
-        <option value="3">Données saisies manuellement</option>
+        <option value="1">Imputation présélectionnée</option>
+        <option value="3">Imputation choisie</option>
+        <option value="2">Données saisies manuellement en CSV</option>
+        
       </select>
+     
       <br>
       <br>
       <div class="row inputData">
@@ -179,26 +256,43 @@
         <div class="col-sm-3 formulaire" > 
 
             <div class="form-part p1">
-              <h4>Données d'entrée présélectionnées </h4>
+              <h4>Imputation présélectionnée </h4>
                 <div id="choix_type_function">
                 <br>
                 <br>
+               
                   <h5>Choisir un type de fonction</h5> 
-                    <select id="chartSelect"  name="chartSelect1" >
-                      <option value="5">Ma liste</option>
-                      <option value="1">x**2</option>
-                      <option value="2">x**5 - x**3</option>
-                      <option value="3">-exp(x)</option>
-                      <option value="4">2*exp(x)</option>
-                      <option value="5">2*(x)</option>
-                      <option value="6">-sqrt(x)</option>
-                      <option value="7">+sqrt(x)</option>
-                      <option value="8">sin(x)</option>
-                      <option value="9">cos(x)</option>
-                      <option value="10">-tan(x)</option>
-                    </select>
+                  <select id="chartSelect"  name="chartSelect1" >
+                    <option value="1">x**2</option>
+                    <option value="2">x**5 - x**3</option>
+                    <option value="3">-exp(x)</option>
+                    <option value="4">2*exp(x)</option>
+                    <option value="5">2*(x)</option>
+                    <option value="6">-sqrt(x)</option>
+                    <option value="7">+sqrt(x)</option>
+                    <option value="8">sin(x)</option>
+                    <option value="9">cos(x)</option>
+                    <option value="10">-tan(x)</option>
+                    <option value="11">sin(x)+cos(x)</option> 
+                  </select>
+                  <br>
+               
+                  <p id="legende1">Fonction utilisée à l'entrainement</p>
+                  <p id="legende2">Fonction non utilisée à l'entrainement</p>
                 </div>
-                <br>
+
+              
+                <div id="frequence_range1" class="d-none">
+                  <h5>Choisir une fréquence pour la fonction : </h5> 
+                  <input type="range" style="width:80%" class="form-range" name="frequence1" value="1"/>
+                </div>
+
+                <div id="frequence_range2" class="d-none">
+                  <h5>Choisir une deuxième fréquence pour la somme de fonctions : </h5> 
+                  <input type="range" style="width:80%" class="form-range" name="frequence2" value="1"/>
+
+                </div>               
+               
                 <br>
                 <div id="choix_type_cut">
                   <h5>Choisir un type d'imputation</h5> 
@@ -215,16 +309,15 @@
                 <br>
                 <h5>Saisir une quantité de bruit :</h5> 
                 <br>
-                <input type="range" style="width:80%" class="form-range" name="customRange1" value="0"/>
+                <input type="range" style="width:80%" class="form-range" name="customRange1" value="25"/>
                 <br>
                 <br>
                 <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
 
             </div>
             
-
             <div class="form-part p2">
-              <h4>Données d'entrée depuis un fichier csv </h4>
+              <h4>Données saisies manuellement en CSV </h4>
               
               <br>
               <h5>(liste de données de 50 points)</h5>
@@ -238,14 +331,13 @@
 
             </div>
              
-
             <div class="form-part p3">
-              <h4>Données d'entrée sélectionnées à la main </h4>
+              <h4>Imputation choisie </h4>
               <div id="choix_type_function">
               <br>
                 <h5>Choisir un type de fonction </h5> 
-                <select id="chartSelect"  name="chartSelect3" >
-                  <option value="5">Ma liste</option>
+                <select id="chartSelect3"  name="chartSelect3" >
+
                   <option value="1">x**2</option>
                   <option value="2">x**5 - x**3</option>
                   <option value="3">-exp(x)</option>
@@ -256,8 +348,23 @@
                   <option value="8">sin(x)</option>
                   <option value="9">cos(x)</option>
                   <option value="10">-tan(x)</option>
+                  <option value="11">sin(x)+cos(x)</option>
                 </select>
+                <p id="legende1">Fonction utilisée à l'entrainement</p>
+                <p id="legende2">Fonction non utilisée à l'entrainement</p>
               </div>
+
+              <div id="frequence_range31" class="d-none">
+                <h5>Choisir une fréquence pour la fonction : </h5> 
+                <input type="range" style="width:80%" class="form-range" name="frequence1" value="1"/>
+              </div>
+
+              <div id="frequence_range32" class="d-none">
+                <h5>Choisir une deuxième fréquence pour la somme de fonctions : </h5> 
+                <input type="range" style="width:80%" class="form-range" name="frequence2" value="1"/>
+
+              </div> 
+
               <br>
               <br>          
               <h5>Saisir un indice* pour le début de l'imputation : </h5> 
@@ -273,7 +380,7 @@
               <p>*indice entre 0 et 50 </p>
               
               <h5>Saisir une quantité de bruit :</h5> 
-              <input type="range" style="width:80%" class="form-range" name="customRange3" value="0"/>
+              <input type="range" style="width:80%" class="form-range" name="customRange3" value="25"/>
               <br>
               <br>
 
@@ -281,12 +388,11 @@
 
             </div>
            
-
           </div>
           
         <div class="col-sm-9">
           <div id="legende">
-            <h5> Type de courbe à reconstruire : {{type_courbe}}.  Indices d'imputation : {{indice_imputation}}. Bruit :{{qte_bruit}}%</h5>
+            <h5> Type de courbe à reconstruire : {{type_courbe}}.  Indices d'imputation : {{indice_imputation}}. Bruit :{{qte_bruit}}%. Fréquence : {{frequence1}} Fréquence 2 : {{frequence2}} </h5>
           </div>
           
           <br>
@@ -298,10 +404,10 @@
      
     </form> 
     
-  </div>  
+  </div> 
     <div class="container2">
       <h2 id="titre3"> Reconstruction : </h2> <br>
-      <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.   </h5>
+      <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.  Fréquence : {{frequence1}} Fréquence 2 : {{frequence2}}   </h5>
     
       <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
         <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
@@ -323,40 +429,145 @@
 
     </div>
   
-
   <script type="text/javascript">
+   
+    document.getElementById("chartSelect").addEventListener("change",affiche_masque);
+    document.getElementById("chartSelect3").addEventListener("change",affiche_masque3);
+
+    function affiche_masque3(event){
+      var value_charselect = document.getElementById("chartSelect3").value
+      value_charselect= parseFloat(value_charselect)
+
+      switch (value_charselect) {
+        case 8:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range32");
+          affiche("frequence_range31");             
+          break;
+        case 9:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range32");
+          affiche("frequence_range31");        
+          break;
+        case 10:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range32");
+          affiche("frequence_range31");
+          break;
+
+        case 11:
+          event.preventDefault();//charrger sur la même page 
+          affiche("frequence_range32");
+          affiche("frequence_range31");
+          break;
+        
+        default:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range32");
+          masque("frequence_range31");
+        
+        }
+    }
+        
+
+    function affiche_masque(event){
+      var value_charselect = document.getElementById("chartSelect").value
+      value_charselect= parseFloat(value_charselect)
+
+      switch (value_charselect) {
+        case 8:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range2");
+          affiche("frequence_range1");
+         
+          
+         
+          break;
+        case 9:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range2");
+          affiche("frequence_range1");
+        
+
+          break;
+        case 10:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range2");
+          affiche("frequence_range1");
+          break;
+
+        case 11:
+          event.preventDefault();//charrger sur la même page 
+          affiche("frequence_range2");
+          affiche("frequence_range1");
+          
+          
+          break;
+          
+
+        default:
+          event.preventDefault();//charrger sur la même page 
+          masque("frequence_range2");
+          masque("frequence_range1");
+         
+        
+        }
+    }
+
+    function masque(id){
+      let element = document.getElementById(id);
+      console.log("masque element=",element)
+      element.classList.add("d-none"); // si id existe on le supprime sinon on l'ajoute
+
+    }
+    function affiche(id){
+      let element = document.getElementById(id);
+      console.log("affiche element=",element)
     
+      element.classList.remove("d-none"); // si id existe on le supprime sinon on l'ajoute
+
+    }
+          
 
     var list_data = {{ finale_prediction|default("")|tojson }} //Redefined here as a js variable
     var list_data_input = {{ fonction_cut|default("")|tojson }}
 
-
     window.onload = function () { chart_input(); chart_predict(); };
-
   
     var indice_modele =  {{ modele|default("")|tojson }}
     indice_modele= parseFloat(indice_modele)
   
-    console.log(" indice_modele =", indice_modele)
+    //console.log(" indice_modele =", indice_modele)
 
     switch (indice_modele) {
       case 1:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
         break;
       case 2:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
         break;
       case 3:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
         break;
       case 4:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
         break; 
       case 5:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+
         break;  
       case 6:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
+        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
+        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
         break;
       case 7:
         document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
@@ -367,10 +578,8 @@
       default:
         document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_0.png')}}";
       }
-
     
-
-      
+    
     function chart_predict(){
         var tab=new Array();
         var new_tab=new Array();
@@ -380,20 +589,16 @@
             new_tab[i]=parseFloat(list_data_input[i]) 
         }
         
-        var data = {
-        // A labels array that can contain any sort of values
-        labels: [],
-        // Our series array that contains series objects or in this case series data arrays
-        series: [
-        new_tab,tab    
-        ]
-        };
+        
         // As options we currently only set a static size of 300x200 px. We can also omit this and use aspect ratio containers
         // as you saw in the previous example
         // Create a new line chart object where as first parameter we pass in a selector
         // that is resolving to our chart container element. The Second parameter
         // is the actual data object. As a third parameter we pass in our custom options.
-        new Chartist.Line('.ct-chart', data);
+        new Chartist.Line('.ct-chart', {
+            labels: [],
+            series: [new_tab,tab ]
+          });
     }
 
     function chart_input(){

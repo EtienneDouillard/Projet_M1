@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "neurofifty-310814",
+  "private_key_id": "166ac38cc3eba0309357343abb32788ed4ad468e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCoU5CPuLx9V4H4\np5YBex5TiNslpB4/JpTPTOTwQje7lB2XzaR0RSUo12gmElvhmkDzRBtopRCR0mIN\nQP/iVu3VAslljvJLkrEG0VdMR+uWvIleRgHoA4mfLvAbTFLuzD5wb9SN5ztAD+hp\nQ7rZjyehpBW5Bd/tc9UA2ZF10qvQsPG4Z+IeQOqWlCoHFcZw3AMUMqNQzNhRClHz\nPbrbw9YxkD6ymdG7qlfhl/pFjeOtyeL7Gc/UhVyZWz/g4ypwiQ5MtMuLZJzIgVcM\nY2HsygyDqxbu7zb0CJhsAjkr6lz3WmEgXMMEnOZhEuk+pfQckMNMcxIDW0WMipEV\nyu9E5D2hAgMBAAECggEAATYLtjBZ4SwpY11/p5j9Y9QPi+6+vc0puNrzPT7OuZmU\nLm4ketEvYPg5d7z9/qqDq98U3ueBeLkgVeXT3tV/CSoHrVnuU0igiog5ph2mMRZq\nxcbAF1gk1qQ+8PAB8JWqioLQJH68zIYoxw7IPViUNuD65ohHfzpW1qEaH18cYnL2\neVOXSxLNYFQS7O2uqXVJmqDGrCSkejIBppaMItyuYyY5ldVQbcGukK9Tv1fIqZuh\n+0eWe8IS7i56R/fWqJYf5KivdjRV9A0d7PPKoS5DnaEz4VHUIH8HHAMr+tBdfigS\nCaYhcWaNlNzrb3PKAvdwWKlHqYvrJQWQeoNTMq2VKQKBgQDkmAXFnwfcdwRPvYYd\nbRAn0OrrMdbIIuiZc5kJwy2AL/ZEim7qdamTaU65DWrz5ygb4gXFAoVIeWs5czem\nSRFdsXllz3oXH9Dw1yny7CPE4NDfv85JWJwItot/B+UmdxmGgrWKvCs3Y8/JGXaJ\n3ZSMUcOt/QyRawM249dlmKV2OQKBgQC8gdI5F0YFhjg9dK+TCqe+FSGCArH0TxOT\nZPTOXw9QA2U71r3urWNVLgkAyxZJ42GNx3J/8bTI3LxbVMo8Aweuu7fWQ8BFbo+F\naOK0wfT/a5M/p6EsC5Wsh1KsfEfStWxWwMKEv0A4tI7m2SuiY0vCvokfIBLtE9H0\np0d1rKLCqQKBgGaSbGybimx7nxykvywvBwPGs9KrP2P4fgR1IWOHB8CwRMHGmDRu\nbZPuudtBUQ92VsIELnCTS/kUOm/B6mOb/8XZ3842ReNgbGHVOkZ9fSNXeYIcz9SL\nhSBHwNpUUZdr87Eur4U8H+wvxknHOjBsk75O5g4JMP2DViLoI3u7/erJAoGAXYb7\nyp+lejAxzywJwKbUuxa43UyBBnoFeGfqnknDyyskGyBcdANK+YQxq1cX4+kRCcsf\nICPIUrBSM+5JuKS4NxWkDIbo6ooEY2i6snxZFjFFiZud98B3rnYlqrau2/hvnEtf\nN4W8U2YiUJ8HazZg7GqklfDP8xiWXxBwAA57YqECgYEAxL+ZpV3VO7/L7CBqDiLi\nuyuuTwZHzbqbOhS2aWeFv1g0yfCgx7qB1RwIp4LZcGF1hzWvchThjjinAT/ZdbEL\nHJTVY8PsX3dHAQPieKOwYNibXhesEXBROrknP/D7oXcFjCTpnrf6/S6ON+drFChP\njUzb50rwGNVZj7Zo03ilywM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "neurofifty-310814@appspot.gserviceaccount.com",
+  "client_id": "104438529514362982222",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/neurofifty-310814%40appspot.gserviceaccount.com"
+}
