@@ -77,7 +77,7 @@ fonction_reconstruite=[]
 def prediction(globale_reconstruction,globale_cut):
 
     ##Connection au serveur 
-    endpoint = 'https://us-central1-ml.googleapis.com'
+    endpoint = 'https://europe-west1-ml.googleapis.com'
     client_options = ClientOptions(api_endpoint=endpoint)
     ml = discovery.build('ml', 'v1', client_options=client_options)
 
@@ -90,7 +90,7 @@ def prediction(globale_reconstruction,globale_cut):
     #Requête en Json 
     request_body = { 'instances': input_array.tolist() }
     #prédiction au serveur 
-    request2 = ml.projects().predict(name='projects/neurofifty-310814/models/final_modele',body=request_body)
+    request2 = ml.projects().predict(name='projects/iseneurofifty/models/modeleV4_1',body=request_body)
     #retour de la prédiction 
     reponse = request2.execute()
     pred=reponse["predictions"]
@@ -458,7 +458,7 @@ def prediction_courbe():
       
     ############################################
     # Choix 3                                  #
-    # Données d'entrée sélectionnées à la main #
+    # Imputation choisi                        #
     ############################################
 
     else:
@@ -468,17 +468,17 @@ def prediction_courbe():
         select_chart3 = request.form.getlist('chartSelect3')
         bruit = request.form.get("customRange3")
         #Requête des fréquences 
-        freq1=request.form.get("frequence1")
-        freq2=request.form.get("frequence2")
+        freq31=request.form.get("frequence31")
+        freq32=request.form.get("frequence32")
     
         #Passage en int 
         indice_type_courbe3 = int(select_chart3[0])
         bruit = int(bruit)
-        freq1 = int(freq1)
-        freq2 = int(freq2)
-        if (freq1 != 0 and freq2 != 0):#Condition pour avoir de la fréquence 
-            freq1=freq1/10
-            freq2=freq2/10
+        freq31 = int(freq31)
+        freq32 = int(freq32)
+        if (freq31 != 0 and freq32 != 0):#Condition pour avoir de la fréquence 
+            freq31=freq31/10
+            freq32=freq32/10
     
             if (bruit==0):
             
@@ -490,10 +490,10 @@ def prediction_courbe():
                         5 : [2*(x/50) for x in range(50)],
                         6 : [-np.sqrt(x/50) for x in range(50)],
                         7 : [np.sqrt(x/50) for x in range(50)],
-                        8 : [np.sin(2*np.pi*x/50) for x in range(50)],
-                        9 : [np.cos(2*np.pi*x/50) for x in range(50)],
-                        10 : [-np.tan(x/50) for x in range(50)],
-                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)],
+                        8 : [np.sin(freq31*np.pi*x/50) for x in range(50)],
+                        9 : [np.cos(freq31*np.pi*x/50) for x in range(50)],
+                        10 : [-np.tan(freq31*(x/50)) for x in range(50)],
+                        11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)],
         
                         }
                     
@@ -507,10 +507,10 @@ def prediction_courbe():
                         5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
                         6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
                         7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        8 : [np.sin(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        9 : [np.cos(2*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        10 : [-np.tan(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        8 : [np.sin(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        9 : [np.cos(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        10 : [-np.tan(freq31*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                        11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
                     }
         else:
             return "Choisir fréquence > 0"
@@ -588,7 +588,7 @@ def prediction_courbe():
         
 
 
-        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,type_courbe=type_courbe,indice_imputation=indice_imputation,modele=7,qte_bruit=bruit,frequence1=freq1,frequence2=freq2)
+        return render_template('courbes.html',finale_prediction=finale_prediction3,fonction_cut=fonction_cut3_2,type_courbe=type_courbe,indice_imputation=indice_imputation,modele=7,qte_bruit=bruit,frequence1=freq31,frequence2=freq32)
 
         
 
