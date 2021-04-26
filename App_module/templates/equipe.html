@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Prédiction d'une courbe fonctionnelle</title>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="pageweb.css" />
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -40,22 +40,20 @@
     </style>
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="{{ url_for('accueil')}}">Accueil</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-              <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">Notre technologie <span class="sr-only">(current)</span></a>
-
-              <a class="nav-item nav-link active" href="{{ url_for('about')}}">A propos</a>
-              <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
-              <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
-            
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <a class="navbar-brand" href="{{ url_for('accueil')}}">Accueil</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <div class="navbar-nav">
+                  <a class="nav-item nav-link active" href="{{ url_for('courbes')}}">La techno<span class="sr-only">(current)</span></a>
+                  <a class="nav-item nav-link active" href="{{ url_for('equipe')}}">Equipe</a>
+                  <a class="nav-item nav-link active" href="{{ url_for('contact')}}">Contact</a>
+                
+              </div>
           </div>
-      </div>
-    </nav>
+        </nav>
     <div id="titre">
       <h1>Notre équipe</h3>
       <p>Qui sommes-nous ?</p>
@@ -65,13 +63,13 @@
         <div class="col-sm-6">
           <img src="{{url_for('static',filename='img/Thomas.jpg')}}" class="rounded-circle">
           <h3>T. Bontemps</h3>
-          <p>Développeur</p>
+          <p>Etuidant Ingénieur ISEN domaine professionnel : développement WEB</p>
           <a href="mailto:thomas.bontemps@isen-ouest.yncrea.fr"><p>thomas.bontemps@isen-ouest.yncrea.fr</p></a>
         </div>
         <div class="col-sm-6">
           <img src="{{url_for('static',filename='img/Etienne.jpg')}}" class="rounded-circle">
           <h3>E. Douillard</h3>
-          <p>Fondateur</p>
+          <p>Etuidant Ingénieur ISEN domaine professionnel : Ingénieur d'affaires</p>
           <a href="mailto:etienne.douillard@isen-ouest.yncrea.fr"><p>etienne.douillard@isen-ouest.yncrea.fr</p></a>
         </div>
       </div>
