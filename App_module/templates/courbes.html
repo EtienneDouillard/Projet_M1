@@ -290,13 +290,18 @@
   
                 
                   <div id="frequence_range1" class="d-none">
-                    <h5>Choisir une fréquence pour la fonction : </h5> 
-                    <input type="range" style="width:80%" class="form-range" name="frequence1" value="1"/>
+                    <h5>Choisir une fréquence pour la fonction : <p  id="freqvalue1" style="display : inline;" ></p> PI</h5> 
+                    
+                    <input type="range" style="width:80%" class="form-range" name="frequence1" id="frequence1" value="0"
+                            oninput="document.getElementById('freqvalue1').innerHTML = this.value/10"
+                    />
                   </div>
   
                   <div id="frequence_range2" class="d-none">
-                    <h5>Choisir une deuxième fréquence pour la somme de fonctions : </h5> 
-                    <input type="range" style="width:80%" class="form-range" name="frequence2" value="1"/>
+                    <h5>Choisir une deuxième fréquence pour la somme de fonctions :<p  id="freqvalue2" style="display : inline;" ></p> PI</h5> 
+                    <input type="range" style="width:80%" class="form-range" name="frequence2" id="frequence2" value="0"
+                          oninput="document.getElementById('freqvalue2').innerHTML = this.value/10"
+                    />
   
                   </div>               
                  
@@ -314,9 +319,11 @@
                   </div>
                   <br>
                   <br>
-                  <h5>Saisir une quantité de bruit :</h5> 
+                  <h5>Saisir une quantité de bruit :<p  id="Bruitvalue1" style="display : inline;" ></p> %</h5> 
                   <br>
-                  <input type="range" style="width:80%" class="form-range" name="customRange1" value="25"/>
+                  <input type="range" style="width:80%" class="form-range" name="customRange1" value="25"
+                        oninput="document.getElementById('Bruitvalue1').innerHTML = this.value"
+                  />
                   <br>
                   <br>
                   <button class="but1 btn-success btn-pull-right" id="bouton" type="submit" >Choisir et reconstruire fonction </button><br>
@@ -362,13 +369,17 @@
                 </div>
   
                 <div id="frequence_range31" class="d-none">
-                  <h5>Choisir une fréquence pour la fonction : </h5> 
-                  <input type="range" style="width:80%" class="form-range" name="frequence31" value="1"/>
+                  <h5>Choisir une fréquence pour la fonction : <p  id="freqvalue31" style="display : inline;" ></p>PI</h5> 
+                  <input type="range" style="width:80%" class="form-range" name="frequence31" id="frequence31" value="0"
+                        oninput="document.getElementById('freqvalue31').innerHTML = this.value/10"
+                  />
                 </div>
   
                 <div id="frequence_range32" class="d-none">
-                  <h5>Choisir une deuxième fréquence pour la somme de fonctions : </h5> 
-                  <input type="range" style="width:80%" class="form-range" name="frequence32" value="1"/>
+                  <h5>Choisir une deuxième fréquence pour la somme de fonctions : <p  id="freqvalue32" style="display : inline;"></p>PI</h5> 
+                  <input type="range" style="width:80%" class="form-range" name="frequence32" id="frequence32" value="0"
+                        oninput="document.getElementById('freqvalue32').innerHTML = this.value/10"
+                  />
   
                 </div> 
   
@@ -386,8 +397,10 @@
   
                 <p>*indice entre 1 et 50 </p>
                 
-                <h5>Saisir une quantité de bruit :</h5> 
-                <input type="range" style="width:80%" class="form-range" name="customRange3" value="25"/>
+                <h5>Saisir une quantité de bruit : <p  id="Bruitvalue1" style="display : inline;" ></p> %</h5> 
+                <input type="range" style="width:80%" class="form-range" name="customRange3" value="25"
+                      oninput="document.getElementById('Bruitvalue1').innerHTML = this.value/10"
+                />
                 <br>
                 <br>
   
@@ -400,14 +413,14 @@
           <div class="col-sm-9">
             <div id="legende">
               <h5> Type de courbe à reconstruire : {{type_courbe}}.  Indices d'imputation : {{indice_imputation}}. Bruit :{{qte_bruit}}%.
-              <div id="legende_frquence1"> Fréquence : {{frequence1}}</div>
-              <div id="legende_frquence1"> Fréquence 2 : {{frequence2}} </div> </h5>
+                <p id="legende_frquence1" style="display : inline;"> Fréquence : {{frequence1}}</p>
+                <p id="legende_frquence2"  style="display : inline;"> Fréquence 2 : {{frequence2}}</p> 
+              </h5>
 
               
             </div>
             <br>
             <div id="chartInput"  style="border-radius: 5px;" class="ct-chart2 ct-perfect-fourth ct-square"></div> 
-            <div id="chartInput2"  style="border-radius: 5px;" class="ct-chart3 ct-perfect-fourth ct-square d-none"></div> 
      
             <p style="text-align: center;color: #fff;text-decoration: underline;">Visualisation de la courbe rentrée dans l'algorithme</p> 
           </div>
@@ -418,13 +431,13 @@
     </div> 
       <div class="container2">
         <h2 id="titre3"> Reconstruction : </h2> <br>
-        <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.  Fréquence : {{frequence1}} Fréquence 2 : {{frequence2}}   </h5>
+        <h5> Type de courbe reconstruite  : {{type_courbe}}. Indices de reconstruction :  {{indice_imputation}}. Bruit :{{qte_bruit}}%.  Fréquence : {{frequence1}} Fréquence 2 : {{frequence2}}</h5>
       
         <div class="row"style="margin-left: auto; margin-right: auto; width: 90%; height: 80%;">
           <div id="chartPredict" style="border-radius: 5px;" class="ct-chart ct-octave"></div> 
         </div>
         <p style="text-align: center;color: #000;text-decoration: underline;">Visualisation de la courbe de prédiction</p>  
-        <h5> Modèle utilisé :  </h5>
+        <h5>Modèle utilisé : </h5>
         <!-- <img id="img_modele" src="{{url_for('static', filename= 'img/modeleFixe0.png' ) }}" />
         -->
         <img id="img_modele1" src="{{url_for('static',filename='img/vide.png')}}" />
@@ -439,8 +452,11 @@
    
         document.getElementById("chartSelect").addEventListener("change",affiche_masque);
         document.getElementById("chartSelect3").addEventListener("change",affiche_masque3);
-
-    
+        //document.getElementById("legende_frquence1").addEventListener(affiche_masque3);
+                 
+     
+        
+        
         function affiche_masque3(event){
           var value_charselect = document.getElementById("chartSelect3").value
           value_charselect= parseFloat(value_charselect)
@@ -448,30 +464,38 @@
           switch (value_charselect) {
             case 8:
               event.preventDefault();//charrger sur la même page 
+              //barre
               masque("frequence_range32");
-              affiche("frequence_range31");             
+              affiche("frequence_range31");   
+
+              
               break;
             case 9:
               event.preventDefault();//charrger sur la même page 
+              //barre
               masque("frequence_range32");
-              affiche("frequence_range31");        
+              affiche("frequence_range31");   
+               
               break;
             case 10:
               event.preventDefault();//charrger sur la même page 
               masque("frequence_range32");
               affiche("frequence_range31");
+            
               break;
     
             case 11:
               event.preventDefault();//charrger sur la même page 
               affiche("frequence_range32");
               affiche("frequence_range31");
+            
               break;
             
             default:
               event.preventDefault();//charrger sur la même page 
               masque("frequence_range32");
               masque("frequence_range31");
+            
             
             }
         }
@@ -486,28 +510,27 @@
               event.preventDefault();//charrger sur la même page 
               masque("frequence_range2");
               affiche("frequence_range1");
-             
-              
-             
+            
               break;
+
             case 9:
               event.preventDefault();//charrger sur la même page 
               masque("frequence_range2");
               affiche("frequence_range1");
-            
-    
+             
               break;
+
             case 10:
               event.preventDefault();//charrger sur la même page 
               masque("frequence_range2");
               affiche("frequence_range1");
+            
               break;
     
             case 11:
               event.preventDefault();//charrger sur la même page 
               affiche("frequence_range2");
               affiche("frequence_range1");
-              
               
               break;
               
@@ -517,7 +540,6 @@
               masque("frequence_range2");
               masque("frequence_range1");
              
-            
             }
         }
     
@@ -525,16 +547,18 @@
           let element = document.getElementById(id);
           //console.log("masque element=",element)
           element.classList.add("d-none"); // si id existe on le supprime sinon on l'ajoute
-    
         }
+
         function affiche(id){
           let element = document.getElementById(id);
-          console.log("affiche element=",element)
-        
+          event.preventDefault();//charrger sur la même page
+          //console.log("affiche element=",element)
           element.classList.remove("d-none"); // si id existe on le supprime sinon on l'ajoute
-    
         }
-              
+       
+
+
+        //récupération données pour graphiques 
     
         var list_data = {{ finale_prediction|default("")|tojson }} //Redefined here as a js variable
         var list_data_input = {{ fonction_cut|default("")|tojson }}
@@ -617,51 +641,8 @@
             
         }
 
-    }
-          
 
-    var list_data = {{ finale_prediction|default("")|tojson }} //Redefined here as a js variable
-    var list_data_input = {{ fonction_cut|default("")|tojson }}
 
-    window.onload = function () { chart_input(); chart_predict(); };
-  
-    var indice_modele =  {{ modele|default("")|tojson }}
-    indice_modele= parseFloat(indice_modele)
-  
-    //console.log(" indice_modele =", indice_modele)
-
-    switch (indice_modele) {
-      case 1:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
-        break;
-      case 2:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
-        break;
-      case 3:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
-        break;
-      case 4:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
-        break; 
-      case 5:
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-
-        break;  
-      case 6:
-        //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-        break;
-      case 7:
-        document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
       
         var indice_modele =  {{ modele|default("")|tojson }}
         indice_modele= parseFloat(indice_modele)
@@ -670,46 +651,41 @@
         
         switch (indice_modele) {
           case 1:
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-    
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_1.png')}}";
             break;
           case 2:
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
-    
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_2.png')}}";
             break;
           case 3:
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
     
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_3.png')}}";
             break;
           case 4:
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
     
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_4.png')}}";
             break; 
           case 5:
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_5.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
     
             break;  
           case 6:
-            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/modeleFixe_6.png')}}";
+            //document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
             break;
           case 7:
-            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModele.png')}}";
+            document.getElementById("img_modele1").src = "{{url_for('static',filename='img/FinalModeleV4.png')}}";
           
     
             break;
     
           default:
             document.getElementById("img_modele1").src = "{{url_for('static',filename='img/vide.png')}}";
-          }
-        
-        
-    
+          } 
          
 
       </script>

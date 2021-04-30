@@ -13,20 +13,24 @@ from google.cloud import storage
 
 app = Flask(__name__)
 
-def prediction(globale_reconstruction,globale_cut):
+path=os.getcwd()
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path+"/iseneurofifty-02ff9e4f2521.json"
 
+
+def predictionCSV(globale_reconstruction,globale_cut):
+    
     ##Connection au serveur 
     endpoint = 'https://europe-west1-ml.googleapis.com'
     client_options = ClientOptions(api_endpoint=endpoint)
     ml = discovery.build('ml', 'v1', client_options=client_options)
+    
 
-    #Normalisation des données d'entrée 
+    #Normalisation des données d'entrée
     norm = np.linalg.norm(globale_reconstruction)
     input_array = globale_reconstruction/norm
-    #print('input_array=',input_array)
-    #input=json.dumps(list(input_array))
-    #print('input=',input)
-
+    #input_array=tf.keras.utils.normalize(globale_reconstruction)
+    print("input_array",input_array)
+    
     #Requête en Json 
     request_body = { 'instances': input_array.tolist() }
     #prédiction au serveur 
@@ -34,15 +38,21 @@ def prediction(globale_reconstruction,globale_cut):
     #retour de la prédiction 
     reponse = request2.execute()
     pred=reponse["predictions"]
+    
+    
     #Passage en array pour reshape [[[50]]] en [50]
     pred=np.array(pred).reshape(50)
-   
+
+
+    for k in range(50):
+        pred[k]=pred[k]*norm
+
     #Nouvelle courbe prédite 
     predictionCourbe = np.full(50,np.nan)
     finale_prediction=[0]*len(pred)
 
     #remplacer les valeurs pour faire une seule et unique courbe à plot 
- 
+    
     calcul_diff=0
     
     if not np.isnan(globale_cut[0]):
@@ -51,6 +61,7 @@ def prediction(globale_reconstruction,globale_cut):
         diff = 0
         calcul_diff=1
 
+    
     for j in range(50):
     
         if(j+1<49):
@@ -69,7 +80,72 @@ def prediction(globale_reconstruction,globale_cut):
             predictionCourbe[j] = pred[j] - diff
      
         finale_prediction[j]=json.dumps(float(predictionCourbe[j]))
-   
+
+    
+    return finale_prediction
+
+def prediction(globale_reconstruction,globale_cut,name_modele):
+
+    
+    ##Connection au serveur 
+    endpoint = 'https://europe-west1-ml.googleapis.com'
+    client_options = ClientOptions(api_endpoint=endpoint)
+    ml = discovery.build('ml', 'v1', client_options=client_options)
+    
+
+    #Normalisation des données d'entrée
+    norm = np.linalg.norm(globale_reconstruction)
+    input_array = globale_reconstruction/norm
+    #input_array=tf.keras.utils.normalize(globale_reconstruction)
+    print("input_array",input_array)
+    
+    #Requête en Json 
+    request_body = { 'instances': input_array.tolist() }
+    #prédiction au serveur 
+    request2 = ml.projects().predict(name='projects/iseneurofifty/models/'+name_modele,body=request_body)
+    #retour de la prédiction 
+    reponse = request2.execute()
+    pred=reponse["predictions"]
+    
+    #Passage en array pour reshape [[[50]]] en [50]
+    pred=np.array(pred).reshape(50)
+
+    #Nouvelle courbe prédite 
+    predictionCourbe = np.full(50,np.nan)
+    finale_prediction=[0]*len(pred)
+
+    #remplacer les valeurs pour faire une seule et unique courbe à plot 
+    
+    calcul_diff=0
+    
+    if not np.isnan(globale_cut[0]):
+        diff = pred[0] - globale_cut[0]
+    else:
+        diff = 0
+        calcul_diff=1
+
+    
+    for j in range(50):
+        
+    
+        if(j+1<49):
+            if (np.isnan(globale_cut[j+1]) and calcul_diff==0 ):
+                
+                diff = pred[j]-globale_cut[j]
+                #print("diff",diff)
+                calcul_diff=1
+                predictionCourbe[j] = globale_cut[j]
+        if(j-1>0 and j-1<49):       
+            if (np.isnan(globale_cut[j-1])):
+                
+
+                predictionCourbe[j] = globale_cut[j]
+        if (np.isnan(globale_cut[j])):
+            predictionCourbe[j] = pred[j] - diff
+     
+        finale_prediction[j]=json.dumps(float(predictionCourbe[j]))
+
+    
     return finale_prediction
 
 def cut_courbe(y,idx,partiePartielle):
@@ -128,22 +204,6 @@ def reconstruction(liste):
             return cut_courbe(liste,indice,tailleCut) 
     return liste, liste  
 
-def implicit():
-    from google.cloud import storage
-
-    # If you don't specify credentials when constructing the client, the
-    # client library will look for credentials in the environment.
-    #storage_client = storage.Client.from_service_account_json('Projet_M1\neurofifty-310814-166ac38cc3eb.json')
-    storage_client = storage.Client.from_service_account_json('../Projet_M1/iseneurofifty-02ff9e4f2521.json')
-
-    #storage_client = storage.Client()
-    # Make an authenticated API request
-    buckets = list(storage_client.list_buckets())
-
-
-    print(buckets)
-
-
 @app.route('/')
 def accueil():
     return render_template('accueil.html') 
@@ -165,7 +225,8 @@ def equipe():
 
 @app.route('/pred',methods=['POST'])
 def pred(): 
- 
+
+    name_modele="modeleV4_1"
     #requètes POST du type de saisie de données lors du sibmit du formulaire. 
     select = request.form.getlist("select")
 
@@ -175,7 +236,7 @@ def pred():
     else:
         return render_template('courbes.html') 
   
-
+    
     ######################################
     # Choix 1                            #
     # Données d'entrée présélectionnées  #
@@ -196,42 +257,40 @@ def pred():
         bruit = int(bruit)
         freq1 = int(freq1)
         freq2 = int(freq2)
-        if (freq1 != 0 and freq2 != 0):#Condition pour avoir de la fréquence 
-            freq1=freq1/10
-            freq2=freq2/10
-       
-            if (bruit==0):
-            
-                choix_courbe = {    
-                        1 : [(x/50)**2 for x in range(50)],
-                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
-                        3 : [-np.exp(x/50) for x in range(50)],
-                        4 : [2*np.exp(x/50) for x in range(50)],
-                        5 : [2*(x/50) for x in range(50)],
-                        6 : [-np.sqrt(x/50) for x in range(50)],
-                        7 : [np.sqrt(x/50) for x in range(50)],
-                        8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)],
-                        9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)],
-                        10 : [-np.tan(freq1*(x/50)) for x in range(50)],
-                        11 : [(np.cos(freq1*np.pi*x/50)+ np.sin(freq2*np.pi*x/50)) for x in range(50)],
-                        }
+        freq1=freq1/10
+        freq2=freq2/10
 
-            else:
-                choix_courbe = {    
-                        1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        10 : [-np.tan(freq1*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+        if (bruit==0):
+        
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)],
+                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
+                    3 : [-np.exp(x/50) for x in range(50)],
+                    4 : [2*np.exp(x/50) for x in range(50)],
+                    5 : [2*(x/50) for x in range(50)],
+                    6 : [-np.sqrt(x/50) for x in range(50)],
+                    7 : [np.sqrt(x/50) for x in range(50)],
+                    8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)],
+                    9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)],
+                    10 : [-np.tan(freq1*(x/50)) for x in range(50)],
+                    11 : [(np.cos(freq1*np.pi*x/50)+ np.sin(freq2*np.pi*x/50)) for x in range(50)],
                     }
+
         else:
-            return "Choisir fréquence > 0"
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    8 : [np.sin(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    9 : [np.cos(freq1*np.pi*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    10 : [-np.tan(freq1*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    11 : [(np.cos(freq1*np.pi*(x/50))+ np.sin(freq2*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                }
+  
         
         if(indice_type_courbe1!=12):
             #Vérification de la fréquence pour afficher la bonne : 
@@ -266,24 +325,45 @@ def pred():
                     8 : "sin(x)",
                     9 : "cos(x)",
                     10 : "tan(x)", 
-                    11 : "co(x) + sin(x)"
+                    11 : "cos(x) + sin(x)",
                 }
              #Choix des modeles possibles en fonction de l'imputation 
             choix_modele ={
-                    1 : 1,
-                    2 : 2,
-                    3 : 3,
-                    4 : 4,
-                    5 : 5,
-                    6 : 6,                
+                    1 : 'modele_prediction_0',
+                    2 : 'modele_prediction_10',
+                    3 : 'modele_prediction_18',
+                    4 : 'modele_prediction_27',
+                    5 : 'modele_prediction_36',
+                    6 : 'modele_prediction_45',  
+             
             }
 
         
             #choix du modèle en fonction de l'indice d'imputation 
             #print("indice_imputationSelect",indice_imputationSelect)
+            name_modele1=choix_modele.get(indice_imputationSelect,-1)
 
-            modele_preselection1=choix_modele.get(indice_imputationSelect,-1)
+            """
+            if modele_preselection1 == 1 :
+                #print("path 1 En dure =",os.getcwd())
+                name_modele1='modele_prediction_0'
+                #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="C:/Users/edoui/Documents/Cours/ISEN/ISEN_M1/ProjetM1/Codes/App/App_production_true_copie_git/Projet_M1_mini/Projet_M1/iseneurofifty-02ff9e4f2521.json"
+
             
+            #elif modele_preselection1 == 2 :
+                #print("path 2 avec getcwd =",os.getcwd())
+                #path=os.getcwd()
+            #    name_modele1='modeleV4_1'
+                #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=path+"/iseneurofifty-02ff9e4f2521.json"
+
+            else:
+                #print("path les autres erreur ")
+                #os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="proute"
+                name_modele1='modeleV4_1'
+            """
+  
+
+
             #Légende type de courbe 
             type_courbe=choix_type_courbe.get(indice_type_courbe1,-1)
 
@@ -297,24 +377,28 @@ def pred():
                 indiceStart = choix_imputation.get(indice_imputationSelect,-1)
                 indiceEnd=50
                 indice_imputation = [indiceStart+1,indiceEnd]
-               
+            
             #Fonction cut d'entrée 
             y = choix_courbe.get(indice_type_courbe1,-1)
             fonction_cut1,fonction_reconstruite1=cut_courbe(y,indiceStart,indiceEnd-indiceStart)
 
         else:
             return render_template('courbes.html')
-       
+    
 
         #Reconstruction et prédiction données manuelles  
         globale_reconstruction1=(np.array(fonction_reconstruite1)).reshape(1,1,50)
         globale_cut1=(np.array(fonction_cut1)).reshape(50)
 
+
+
         #appel de la fonction predict avec le modele spécial en fonction de l'imputation. 
-        finale_prediction1=prediction(globale_reconstruction1,globale_cut1)
+        print("prédiction avec",name_modele1)
+        finale_prediction1=prediction(globale_reconstruction1,globale_cut1,name_modele1)
+
             
         globale_reconstruction1=(np.array(fonction_reconstruite1)).reshape(50)
-   
+
 
         #Données fonctionnelles reconstruites suite aux données présélectionnées 
         fonction_cut1_2=[0]*(len(fonction_cut1))
@@ -327,10 +411,9 @@ def pred():
             fonction_reconstruite1_2[j]=(json.dumps(float(fonction_reconstruite1[j])))
             globale_reconstruction1_2[j]=(json.dumps(float(globale_reconstruction1[j])))
 
-
         #choix type modèle 
         indice_modele=json.dumps(indice_imputationSelect)
-
+        print("finale_prediction1",finale_prediction1)
         return render_template('courbes.html',globale_reconstruction=globale_reconstruction1_2,finale_prediction=finale_prediction1,fonction_cut=fonction_cut1_2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=indice_modele,frequence1=freq1,frequence2=freq2)
 
         
@@ -369,7 +452,6 @@ def pred():
                     if outTrou == True and row[1]=='' : 
                         return "Ne saisir qu'une seule imputation "
 
-
                     try:
                         float(row[1])
                     except ValueError:
@@ -384,6 +466,8 @@ def pred():
         if(len(fonction_cut)!=50):
            
             return "La taille doit être de 50 et ne comporter qu'une liste"
+        
+
         fonction_cut,fonction_reconstruite = reconstruction(fonction_cut)
 
     
@@ -396,26 +480,32 @@ def pred():
         globale_reconstruction=(np.array(fonction_reconstruite)).reshape(1,1,50)
         globale_cut=(np.array(fonction_cut)).reshape(50)
 
-        finale_prediction=prediction(globale_reconstruction,globale_cut)
+        print("globale_reconstruction=",globale_reconstruction)
+
+        finale_prediction=predictionCSV(globale_reconstruction,globale_cut)
         globale_reconstruction=(np.array(globale_reconstruction)).reshape(50)
 
 
         #données fonctionnelles reconstruites suite auc données préselectionnées 
         fonction_cut2=[0]*(len(fonction_cut))
-        fonction_reconstruite2=[0]*(len(fonction_cut))
+        #fonction_reconstruite2=[0]*(len(fonction_cut))
         globale_reconstruction2_2=[0]*(len(globale_reconstruction))
 
+        finale_prediction2=[0]*(len(globale_reconstruction))
+        
         #passage en json.dump pour traitement js dans chart. 
         for j in range(50):
             fonction_cut2[j]=(json.dumps(float(fonction_cut[j])))
-            fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
+            #fonction_reconstruite2[j]=(json.dumps(float(fonction_reconstruite[j])))
             globale_reconstruction2_2[j]=(json.dumps(float(globale_reconstruction[j])))
+            finale_prediction2[j]=(json.dumps(float(finale_prediction[j])))
 
-
-
+        print("finale_prediction2=",finale_prediction2)
         #modele=7 --> Le modele principal 
-        return render_template('courbes.html',globale_reconstruction=globale_reconstruction2_2,finale_prediction=finale_prediction,fonction_cut=fonction_cut2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=7)
+        
+        #return render_template('courbes.html',globale_reconstruction=globale_reconstruction2_2,finale_prediction=finale_prediction,fonction_cut=fonction_cut2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=7)
 
+        return render_template('courbes.html',globale_reconstruction=globale_reconstruction2_2,finale_prediction=finale_prediction2,fonction_cut=fonction_cut2,type_courbe=type_courbe,indice_imputation=indice_imputation,qte_bruit=bruit,modele=7)
 
       
     ############################################
@@ -438,44 +528,43 @@ def pred():
         bruit = int(bruit)
         freq31 = int(freq31)
         freq32 = int(freq32)
-        if (freq31 != 0 and freq32 != 0):#Condition pour avoir de la fréquence 
-            freq31=freq31/10
-            freq32=freq32/10
     
-            if (bruit==0):
-            
-                choix_courbe = {    
-                        1 : [(x/50)**2 for x in range(50)],
-                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
-                        3 : [-np.exp(x/50) for x in range(50)],
-                        4 : [2*np.exp(x/50) for x in range(50)],
-                        5 : [2*(x/50) for x in range(50)],
-                        6 : [-np.sqrt(x/50) for x in range(50)],
-                        7 : [np.sqrt(x/50) for x in range(50)],
-                        8 : [np.sin(freq31*np.pi*x/50) for x in range(50)],
-                        9 : [np.cos(freq31*np.pi*x/50) for x in range(50)],
-                        10 : [-np.tan(freq31*(x/50)) for x in range(50)],
-                        11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)],
-        
-                        }
-                    
+        freq31=freq31/10
+        freq32=freq32/10
 
-            else:
-                choix_courbe = {    
-                        1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        8 : [np.sin(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        9 : [np.cos(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        10 : [-np.tan(freq31*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
-                        11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+        if (bruit==0):
+        
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)],
+                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)],
+                    3 : [-np.exp(x/50) for x in range(50)],
+                    4 : [2*np.exp(x/50) for x in range(50)],
+                    5 : [2*(x/50) for x in range(50)],
+                    6 : [-np.sqrt(x/50) for x in range(50)],
+                    7 : [np.sqrt(x/50) for x in range(50)],
+                    8 : [np.sin(freq31*np.pi*x/50) for x in range(50)],
+                    9 : [np.cos(freq31*np.pi*x/50) for x in range(50)],
+                    10 : [-np.tan(freq31*(x/50)) for x in range(50)],
+                    11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)],
+    
                     }
+                
+
         else:
-            return "Choisir fréquence > 0"
+            choix_courbe = {    
+                    1 : [(x/50)**2 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    2 : [(x/50)**5 - (x/50)**3 for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    3 : [-np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    4 : [2*np.exp(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    5 : [2*(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    6 : [-np.sqrt(x/50) for x in range(50)]+ np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    7 : [np.sqrt(x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    8 : [np.sin(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    9 : [np.cos(freq31*np.pi*x/50) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    10 : [-np.tan(freq31*(x/50)) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                    11 : [(np.cos(freq31*np.pi*(x/50))+ np.sin(freq32*np.pi*(x/50))) for x in range(50)] + np.random.normal(size=50,loc=0,scale=np.sqrt(bruit/1000)),
+                }
+    
 
         #str pour légende type de courbe penser à modifer lors d'ajout de nouveaux modèles. 
         choix_type_courbe={
@@ -485,11 +574,11 @@ def pred():
                     4 : "-exp(x)",
                     5 : "2x",
                     6 : "-sqrt(x)",
-                    7: "+sqrt(x",
+                    7: "+sqrt(x)",
                     8 : "sin(x)",
                     9 : "cos(x)",
                     10 : "tan(x)", 
-                    11 : "co(x) + sin(x)",
+                    11 : "cos(x) + sin(x)",
                 }
 
         #print("indice_type_courbe3",indice_type_courbe3)
@@ -533,7 +622,7 @@ def pred():
         globale_reconstruction3=(np.array(fonction_reconstruite3)).reshape(1,1,50)
         globale_cut3=(np.array(fonction_cut3)).reshape(50)
 
-        finale_prediction3=prediction(globale_reconstruction3,globale_cut3)
+        finale_prediction3=prediction(globale_reconstruction3,globale_cut3,name_modele)
         globale_reconstruction3=(np.array(fonction_reconstruite3)).reshape(50)
 
 
